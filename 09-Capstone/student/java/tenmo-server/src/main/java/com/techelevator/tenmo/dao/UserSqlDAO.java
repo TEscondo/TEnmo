@@ -1,5 +1,6 @@
 package com.techelevator.tenmo.dao;
 
+import java.security.Principal;
 import java.sql.PreparedStatement;
 import java.util.ArrayList;
 import java.util.List;
@@ -23,6 +24,19 @@ public class UserSqlDAO implements UserDAO {
         this.jdbcTemplate = jdbcTemplate;
     }
 
+    @Override
+    public double getBalance(Principal principal) {
+    	String username = principal.getName();
+    	int userId = findIdByUsername(username);
+    	
+    	String sql = "Select balance from accounts where user_id = ?";
+    	SqlRowSet row = jdbcTemplate.queryForRowSet(sql, userId);
+    	double balance = row.getDouble("balance");
+    	
+    	return balance;
+    }
+    
+    
     @Override
     public int findIdByUsername(String username) {
         return jdbcTemplate.queryForObject("select user_id from users where username = ?", int.class, username);

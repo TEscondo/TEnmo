@@ -1,5 +1,11 @@
 package com.techelevator.tenmo;
 
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.web.client.RestClientResponseException;
+import org.springframework.web.client.RestTemplate;
+
 import com.techelevator.tenmo.models.AuthenticatedUser;
 import com.techelevator.tenmo.models.UserCredentials;
 import com.techelevator.tenmo.services.AuthenticationService;
@@ -10,6 +16,7 @@ public class App {
 
 private static final String API_BASE_URL = "http://localhost:8080/";
     
+
     private static final String MENU_OPTION_EXIT = "Exit";
     private static final String LOGIN_MENU_OPTION_REGISTER = "Register";
 	private static final String LOGIN_MENU_OPTION_LOGIN = "Login";
@@ -25,8 +32,9 @@ private static final String API_BASE_URL = "http://localhost:8080/";
     private AuthenticatedUser currentUser;
     private ConsoleService console;
     private AuthenticationService authenticationService;
+    public RestTemplate rest = new RestTemplate();
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws AuthenticationServiceException {
     	App app = new App(new ConsoleService(System.in, System.out), new AuthenticationService(API_BASE_URL));
     	app.run();
     }
@@ -36,7 +44,7 @@ private static final String API_BASE_URL = "http://localhost:8080/";
 		this.authenticationService = authenticationService;
 	}
 
-	public void run() {
+	public void run() throws AuthenticationServiceException {
 		System.out.println("*********************");
 		System.out.println("* Welcome to TEnmo! *");
 		System.out.println("*********************");
@@ -45,7 +53,7 @@ private static final String API_BASE_URL = "http://localhost:8080/";
 		mainMenu();
 	}
 
-	private void mainMenu() {
+	private void mainMenu() throws AuthenticationServiceException {
 		while(true) {
 			String choice = (String)console.getChoiceFromOptions(MAIN_MENU_OPTIONS);
 			if(MAIN_MENU_OPTION_VIEW_BALANCE.equals(choice)) {
@@ -67,9 +75,9 @@ private static final String API_BASE_URL = "http://localhost:8080/";
 		}
 	}
 
-	private void viewCurrentBalance() {
-		// TODO Auto-generated method stub
-		
+	private void viewCurrentBalance() throws AuthenticationServiceException {
+		double balance = authenticationService.getBalance(currentUser.getToken());
+		System.out.println("Your current account balance is $" + balance);
 	}
 
 	private void viewTransferHistory() {
@@ -151,4 +159,5 @@ private static final String API_BASE_URL = "http://localhost:8080/";
 		String password = console.getUserInput("Password");
 		return new UserCredentials(username, password);
 	}
+
 }
