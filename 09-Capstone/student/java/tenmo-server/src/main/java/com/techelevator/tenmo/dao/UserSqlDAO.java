@@ -28,10 +28,14 @@ public class UserSqlDAO implements UserDAO {
     public double getBalance(Principal principal) {
     	String username = principal.getName();
     	int userId = findIdByUsername(username);
+    	double balance = 0.0;
     	
     	String sql = "Select balance from accounts where user_id = ?";
     	SqlRowSet row = jdbcTemplate.queryForRowSet(sql, userId);
-    	double balance = row.getDouble("balance");
+    	while (row.next()) {
+        	balance = row.getDouble("balance");
+
+    	}
     	
     	return balance;
     }
