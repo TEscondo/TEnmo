@@ -1,6 +1,7 @@
 package com.techelevator.tenmo.services;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Map;
 
 import org.springframework.http.HttpEntity;
@@ -13,6 +14,7 @@ import org.springframework.web.client.RestTemplate;
 
 import com.techelevator.tenmo.models.AuthenticatedUser;
 import com.techelevator.tenmo.models.Transfer;
+import com.techelevator.tenmo.models.User;
 import com.techelevator.tenmo.models.UserCredentials;
 
 public class AuthenticationService {
@@ -112,5 +114,12 @@ public class AuthenticationService {
 	        }
 		  return tran;
 	  }
+	  
+	  public User[] getUsers(String token) {
+		  AUTH_TOKEN = token;
+		  User[] users = restTemplate.exchange(BASE_URL + "account/allaccounts", HttpMethod.GET, makeAuthEntity(), User[].class).getBody();
+		  return users;
+	  }
+	  
 	  
 }

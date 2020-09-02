@@ -145,4 +145,30 @@ public class UserSqlDAO implements UserDAO {
 		return transfer;
 	}
 
+	@Override
+	public boolean updateBalance(Transfer transfer) {
+		boolean result = false;
+		String sql = "BEGIN TRANSACTION;"
+		+ "UPDATE accounts" +
+		"SET balance = balance +" +
+		"(SELECT amount FROM transfers WHERE transfer_id = ? AND transfer_status = 1)" +
+		"WHERE account_id =" +
+		"(SELECT account_to FROM transfers WHERE transfer_id = ? AND transfer_status = 1);" +
+		"UPDATE accounts" +
+		"SET balance = balance -" + 
+		"(SELECT amount FROM transfers WHERE transfer_id = ? AND transfer_status = 1)" +
+		"WHERE account_id =" +
+		"(SELECT account_from FROM transfers WHERE transfer_id = ? AND transfer_status = 1);" +
+		"UPDATE transfers SET transfer_status_id = 2 WHERE transfer_id = ?;"
+		+ "COMMIT;";
+		
+		int updates = jdbcTemplate.update(sql, transfer.getTransfer_id(), transfer.getTransfer_id(), transfer.getTransfer_id(), transfer.getTransfer_id());
+		if (updates == 3) {
+			result = true;
+		}
+		return result;
+	}
+	
+	
+
 }
