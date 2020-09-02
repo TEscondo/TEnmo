@@ -12,6 +12,7 @@ import org.springframework.web.client.RestClientResponseException;
 import org.springframework.web.client.RestTemplate;
 
 import com.techelevator.tenmo.models.AuthenticatedUser;
+import com.techelevator.tenmo.models.Transfer;
 import com.techelevator.tenmo.models.UserCredentials;
 
 public class AuthenticationService {
@@ -100,4 +101,16 @@ public class AuthenticationService {
 	        HttpEntity entity = new HttpEntity<>(headers);
 	        return entity;
 	    }
+	  
+	  public Transfer newTransfer(String token) throws AuthenticationServiceException {
+		  AUTH_TOKEN = token;
+		  Transfer tran;
+		  try {
+			 tran = restTemplate.exchange(BASE_URL + "transfer", HttpMethod.POST, makeAuthEntity(), Transfer.class).getBody();
+		  } catch (RestClientResponseException ex) {
+	            throw new AuthenticationServiceException(ex.getRawStatusCode() + " : " + ex.getResponseBodyAsString());
+	        }
+		  return tran;
+	  }
+	  
 }

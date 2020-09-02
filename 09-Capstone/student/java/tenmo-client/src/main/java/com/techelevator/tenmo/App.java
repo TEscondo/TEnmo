@@ -7,6 +7,7 @@ import org.springframework.web.client.RestClientResponseException;
 import org.springframework.web.client.RestTemplate;
 
 import com.techelevator.tenmo.models.AuthenticatedUser;
+import com.techelevator.tenmo.models.Transfer;
 import com.techelevator.tenmo.models.UserCredentials;
 import com.techelevator.tenmo.services.AuthenticationService;
 import com.techelevator.tenmo.services.AuthenticationServiceException;
@@ -90,8 +91,9 @@ private static final String API_BASE_URL = "http://localhost:8080/";
 		
 	}
 
-	private void sendBucks() {
-		// TODO Auto-generated method stub
+	private void sendBucks() throws AuthenticationServiceException {
+		Transfer transfer = authenticationService.newTransfer(currentUser.getToken());
+		System.out.println("Transfer sent");
 		
 	}
 

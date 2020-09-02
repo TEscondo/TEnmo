@@ -24,6 +24,7 @@ import com.techelevator.tenmo.dao.UserDAO;
 import com.techelevator.tenmo.dao.UserSqlDAO;
 import com.techelevator.tenmo.model.LoginDTO;
 import com.techelevator.tenmo.model.RegisterUserDTO;
+import com.techelevator.tenmo.model.Transfer;
 import com.techelevator.tenmo.model.User;
 import com.techelevator.tenmo.model.UserAlreadyExistsException;
 import com.techelevator.tenmo.security.jwt.JWTFilter;
@@ -50,6 +51,11 @@ public class AuthenticationController {
     @RequestMapping(value="/balance",method=RequestMethod.GET)
     public double getBalance(Principal principal) {
     	return userDAO.getBalance(principal);
+    }
+    
+    @RequestMapping(value="/transfer", method=RequestMethod.POST)
+    public Object transfer(Transfer transfer) {
+    	return userDAO.transfer(transfer);
     }
     
     @PreAuthorize("permitAll")

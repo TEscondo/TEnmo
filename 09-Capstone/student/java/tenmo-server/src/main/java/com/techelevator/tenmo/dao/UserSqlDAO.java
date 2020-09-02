@@ -12,6 +12,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import com.techelevator.tenmo.model.Transfer;
 import com.techelevator.tenmo.model.User;
 
 @Service
@@ -106,4 +107,42 @@ public class UserSqlDAO implements UserDAO {
         user.setAuthorities("ROLE_USER");
         return user;
     }
+
+    @Override
+    public Transfer transfer(Transfer transfer) {
+		String sqlBalance = "SELECT balance FROM accounts WHERE account_id = ?";
+		SqlRowSet rs = jdbcTemplate.queryForRowSet(sqlBalance, transfer.getAccount_from());
+		double transferAmount = transfer.getAmount();
+		double compare = 0.0;
+		if (rs.next()) {
+			compare = new Double(rs.getDouble("balance"));
+		}
+		if (transferAmount < compare) {
+			String sql = "INSERT INTO transfers (transfer_type_id, transfer_status_id, account_from, account_to, amount)" +
+					"VALUES (2,1,?,?,?) RETURNING transfer_id";
+			SqlRowSet rs2 = jdbcTemplate.queryForRowSet(sql, transfer.getAccount_from(), transfer.getAccount_to(), transfer.getAmount());
+			if (rs2.next()) {
+				transfer.setTransfer_id(rs2.getInt("transfer_id"));
+			}
+			
+			return transfer;
+			
+		} else {
+			System.out.println("Insufficient funds");
+			return null;
+		}
+	
+	}
+	
+	private Transfer mapRowToTransfer(SqlRowSet rs) {
+		int transferId = (rs.getInt("transfer_id"));
+		int transferTypeId = (rs.getInt("transfer_type_id"));
+		int transferStatusId = (rs.getInt("transfer_status_id"));
+		int accountFrom = (rs.getInt("account_from"));
+		int accountTo = (rs.getInt("account_to"));
+		double amount = (rs.getDouble("amount"));
+		Transfer transfer = new Transfer(transferId, transferTypeId,transferStatusId,accountFrom,accountTo,amount);
+		return transfer;
+	}
+
 }
