@@ -20,6 +20,7 @@ public class UserSqlDAO implements UserDAO {
 
     private static final double STARTING_BALANCE = 1000;
     private JdbcTemplate jdbcTemplate;
+    private User user = new User();
 
     public UserSqlDAO(JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
@@ -143,6 +144,139 @@ public class UserSqlDAO implements UserDAO {
 		double amount = (rs.getDouble("amount"));
 		Transfer transfer = new Transfer(transferId, transferTypeId,transferStatusId,accountFrom,accountTo,amount);
 		return transfer;
+	}
+
+	@Override
+	public void viewTransfers() {
+		
+		System.out.println("-----------------TRANSFERS-----------------");
+		System.out.println("ID          From/To                 Amount");
+		System.out.println("-------------------------------------------");
+		
+		//GET TRANSFERS FROM YOUR ACCOUNT TO ANOTHER ACCOUNT
+		
+		int accountId = 0;
+		long userId = user.getId();
+		String sqlForAccountId = "SELECT account_id FROM accounts WHERE user_id = ?";
+		SqlRowSet rowsetForAccountId = jdbcTemplate.queryForRowSet(sqlForAccountId, userId);
+		while(rowsetForAccountId.next()) {
+			accountId = rowsetForAccountId.getInt("account_id");
+		}
+		
+		int transferId = 0;
+		double amount = 0.0;
+		int accountIdToUser = 0;
+		String sql = "SELECT transfer_id, account_to, amount FROM transfers WHERE account_from = ?";
+		SqlRowSet row = jdbcTemplate.queryForRowSet(sql, accountId);
+		while(row.next()) {
+			transferId = row.getInt("transfer_id");
+			amount = row.getDouble("amount");
+			accountIdToUser = row.getInt("account_to");
+		}
+		
+		int userIdToUser = 0;
+		String sql1 = "SELECT user_id FROM accounts WHERE account_id = ?";
+		SqlRowSet rowset = jdbcTemplate.queryForRowSet(sql1, accountIdToUser);
+		while(rowset.next()) {
+			userIdToUser = rowset.getInt("user_id");
+		}
+		
+		String usernameToUser = "";
+		String sql2 = "SELECT username FROM users WHERE user_id = ?";
+		SqlRowSet rowset1 = jdbcTemplate.queryForRowSet(sql2, userIdToUser);
+		while(rowset1.next()) {
+			usernameToUser = rowset1.getNString("username");
+		}
+		
+		System.out.println(transferId + "          To: " + usernameToUser + "          $ " + amount);
+		
+		//GET TRANSFERS TO YOUR ACCOUNT FROM ANOTHER ACCOUNT
+		int accountIdFromUser = 0;
+		String sql3 = "SELECT transfer_id, account_from, amount FROM transfers WHERE account_to = ?";
+		SqlRowSet row3 = jdbcTemplate.queryForRowSet(sql3, accountId);
+		while(row3.next()) {
+			transferId = row.getInt("transfer_id");
+			amount = row.getDouble("amount");
+			accountIdFromUser = row.getInt("account_from");
+		}
+		
+		int userIdFromUser = 0;
+		String sql4 = "SELECT user_id FROM accounts WHERE account_id = ?";
+		SqlRowSet row4 = jdbcTemplate.queryForRowSet(sql4, accountIdFromUser);
+		while(row4.next()) {
+			userIdFromUser = row4.getInt("user_id");
+		}
+		
+		String usernameFromUser = "";
+		String sql5 = "SELECT username FROM users WHERE user_id = ?";
+		SqlRowSet row5 = jdbcTemplate.queryForRowSet(sql5, userIdFromUser);
+		while(row5.next()) {
+			usernameFromUser = row5.getNString("username");
+		}
+		
+		System.out.println(transferId + "          From: " + usernameFromUser + "          $ " + amount);
+	}
+	
+	public void viewTransferDetails(int transferId) {
+		int transferTypeId = 0;
+		int transferStatusId = 0;
+		int accountFrom = 0;
+		int accountTo = 0;
+		double amount = 0.0;
+		String sql = "SELECT * FROM transfers WHERE transfer_id = ?";
+		SqlRowSet row = jdbcTemplate.queryForRowSet(sql, transferId);
+		while(row.next()) {
+			transferTypeId = row.getInt("transfer_type_id");
+			transferStatusId = row.getInt("transfer_status_id");
+			accountFrom = row.getInt("account_from");
+			accountTo = row.getInt("account_to");
+			amount = row.getDouble("amount");
+		}
+		
+		//get FROM username
+		int userIdFrom = 0;
+		String sql1 = "SELECT user_id FROM accounts WHERE account_id = ?";
+		SqlRowSet row1 = jdbcTemplate.queryForRowSet(sql1, accountFrom);
+		while(row1.next()) {
+			userIdFrom = row1.getInt("user_id");
+		}
+		
+		String usernameFrom = "";
+		String sql2 = "SELECT username FROM users WHERE user_id = ?";
+		SqlRowSet row2 = jdbcTemplate.queryForRowSet(sql2, userIdFrom);
+		while(row2.next()) {
+			usernameFrom = row2.getNString("username");
+		}
+		
+		//get TO username
+		int userIdTo = 0;
+		String sql3 = "SELECT user_id FROM accounts WHERE account_id = ?";
+		SqlRowSet row3 = jdbcTemplate.queryForRowSet(sql3, accountTo);
+		while(row3.next()) {
+			userIdTo = row3.getInt("user_id");
+		}
+		
+		String usernameTo = "";
+		String sql4 = "SELECT username FROM users WHERE user_id = ?";
+		SqlRowSet row4 = jdbcTemplate.queryForRowSet(sql4, userIdTo);
+		while(row4.next()) {
+			usernameTo = row4.getNString("username");
+		}
+		
+		//get TRANSFER TYPE
+		
+		
+		//get TRANSFER STATUS
+		
+		System.out.println("--------------------------------------------");
+		System.out.println("Transfer Details");
+		System.out.println("--------------------------------------------");
+		
+		System.out.println("Id: " + transferId);
+		System.out.println("From: " + usernameFrom);
+		System.out.println("To: " + usernameTo);
+		System.out.println("");
+		
 	}
 
 }

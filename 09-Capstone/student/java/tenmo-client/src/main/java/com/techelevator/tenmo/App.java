@@ -1,5 +1,7 @@
 package com.techelevator.tenmo;
 
+import java.util.Scanner;
+
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -81,8 +83,20 @@ private static final String API_BASE_URL = "http://localhost:8080/";
 		System.out.println("Your current account balance is $" + balance);
 	}
 
-	private void viewTransferHistory() {
-		// TODO Auto-generated method stub
+	private void viewTransferHistory() throws AuthenticationServiceException {
+		authenticationService.viewTransfers(currentUser.getToken());
+		System.out.println("---------");
+		System.out.println("Please enter transfer ID to view details (0 to cancel): ");
+		
+		Scanner scanner = new Scanner(System.in);
+		int transferId = Integer.parseInt(scanner.nextLine());
+		scanner.close();
+		
+		if(transferId == 0) {
+			System.exit(0);
+		}
+		
+		
 		
 	}
 
