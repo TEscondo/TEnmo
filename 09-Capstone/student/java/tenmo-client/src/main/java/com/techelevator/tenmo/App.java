@@ -107,8 +107,22 @@ private static final String API_BASE_URL = "http://localhost:8080/";
 	}
 
 	private void sendBucks() throws AuthenticationServiceException {
-		Transfer transfer = authenticationService.newTransfer(currentUser.getToken());
-		System.out.println("Transfer sent");
+		showUsers();
+		System.out.println("Enter ID number of user you are sending funds to (0 to cancel)");
+		Scanner input = new Scanner(System.in);
+		int userId = input.nextInt();
+		if (userId != 0) {
+			System.out.println("How much will you send?");
+			Scanner amountInput = new Scanner(System.in);
+			double amount = amountInput.nextDouble();
+			Transfer transferProcess = new Transfer(userId, amount);
+			authenticationService.newTransfer(currentUser.getToken());
+			System.out.println(amount + " TE BUCKS were sent to ID: " + userId);
+		}
+		else {
+			System.out.println("Cancel transfer");
+		}
+	
 		
 	}
 
