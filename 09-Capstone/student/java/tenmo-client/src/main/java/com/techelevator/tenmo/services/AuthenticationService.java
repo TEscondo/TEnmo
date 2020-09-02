@@ -16,8 +16,10 @@ import com.techelevator.tenmo.models.UserCredentials;
 
 public class AuthenticationService {
 
+	public static String AUTH_TOKEN = "";
     private String BASE_URL;
     private RestTemplate restTemplate = new RestTemplate();
+    
 
     public AuthenticationService(String url) {
         this.BASE_URL = url;
@@ -80,4 +82,22 @@ public class AuthenticationService {
 		}
 		return message;
 	}
+	
+	  public double getBalance(String token) throws AuthenticationServiceException {
+		  AUTH_TOKEN = token;
+		  double balance = 0.0;
+			try {
+				balance = restTemplate.exchange(BASE_URL + "balance", HttpMethod.GET, makeAuthEntity(), double.class).getBody();
+			} catch (RestClientResponseException ex) {
+	            throw new AuthenticationServiceException(ex.getRawStatusCode() + " : " + ex.getResponseBodyAsString());
+	        }
+			return balance;
+	    }
+	
+	  private HttpEntity makeAuthEntity() {
+	        HttpHeaders headers = new HttpHeaders();
+	        headers.setBearerAuth(AUTH_TOKEN);
+	        HttpEntity entity = new HttpEntity<>(headers);
+	        return entity;
+	    }
 }
