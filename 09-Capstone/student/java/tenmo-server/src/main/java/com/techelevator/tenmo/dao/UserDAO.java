@@ -8,11 +8,17 @@ import java.util.List;
 
 public interface UserDAO {
 
+
 	void viewTransferDetails(int transferId);
 	
 	void viewTransfers();
 	
 	Object transfer(Transfer transfer);
+
+	Transfer transfer(Transfer transfer);
+	
+	boolean updateBalance(Transfer transfer);
+
 	
 	double getBalance(Principal principal);
 	

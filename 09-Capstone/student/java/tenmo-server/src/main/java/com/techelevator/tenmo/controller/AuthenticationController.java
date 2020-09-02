@@ -59,9 +59,18 @@ public class AuthenticationController {
     }
     
     @RequestMapping(value="/transfer", method=RequestMethod.POST)
-    public Object transfer(Transfer transfer) {
-    	return userDAO.transfer(transfer);
+    public Transfer transfer(@RequestBody Transfer transfer) {
+    	Transfer pending = null;
+    	pending = userDAO.transfer(transfer);
+    	userDAO.updateBalance(pending);
+    	return pending;
     }
+    
+    @RequestMapping(value="/transfer", method=RequestMethod.PUT)
+    public void makeTransfer(@RequestBody Transfer transfer) {
+    	userDAO.updateBalance(transfer);
+    }
+    
     
     @PreAuthorize("permitAll")
     @RequestMapping(value = "/login", method = RequestMethod.POST)
