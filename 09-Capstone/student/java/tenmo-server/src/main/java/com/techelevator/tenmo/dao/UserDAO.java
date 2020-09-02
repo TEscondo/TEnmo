@@ -12,8 +12,6 @@ public interface UserDAO {
 	void viewTransferDetails(int transferId);
 	
 	void viewTransfers();
-	
-	Object transfer(Transfer transfer);
 
 	Transfer transfer(Transfer transfer);
 	
