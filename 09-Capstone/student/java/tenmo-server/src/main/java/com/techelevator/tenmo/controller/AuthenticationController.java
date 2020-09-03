@@ -54,6 +54,11 @@ public class AuthenticationController {
     	userDAO.viewTransfers();
     }
     
+    @RequestMapping(value="/transfers/pending",method=RequestMethod.GET)
+    public void viewPending() {
+    	userDAO.viewPending();
+    }
+    
     @RequestMapping(value="/balance",method=RequestMethod.GET)
     public double getBalance(Principal principal) {
     	return userDAO.getBalance(principal);
@@ -95,10 +100,6 @@ public class AuthenticationController {
     public List<User> getAccount(Principal principal) {
     	return userDAO.findAll();
     }
-    
-    
-    
-    
     
     @PreAuthorize("permitAll")
     @ResponseStatus(HttpStatus.CREATED)
