@@ -130,8 +130,17 @@ public class AuthenticationService {
 		  } catch (RestClientResponseException ex) {
 	            throw new AuthenticationServiceException(ex.getRawStatusCode() + " : " + ex.getResponseBodyAsString());
 	        }
+	  
 	  }
 	  
+	  public void viewPending(String token) throws AuthenticationServiceException {
+		  AUTH_TOKEN = token;
+		  try {
+			  restTemplate.exchange(BASE_URL + "transfers/pending", HttpMethod.GET, makeAuthEntity(), Transfer.class).getBody();
+		  } catch (RestClientResponseException ex) {
+	            throw new AuthenticationServiceException(ex.getRawStatusCode() + " : " + ex.getResponseBodyAsString());
+	        }
+	  }
 
 	  public User[] getUsers(String token) throws AuthenticationServiceException {
 		  AUTH_TOKEN = token;

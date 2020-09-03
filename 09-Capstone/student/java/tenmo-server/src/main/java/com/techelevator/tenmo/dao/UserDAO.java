@@ -8,6 +8,7 @@ import java.util.List;
 
 public interface UserDAO {
 
+	void updatePending(int optionChoice, int transferId);
 
 	void viewTransferDetails(int transferId);
 	
@@ -17,6 +18,7 @@ public interface UserDAO {
 	
 	boolean updateBalance(Transfer transfer);
 
+	void viewPending();
 	
 	double getBalance(Principal principal);
 	

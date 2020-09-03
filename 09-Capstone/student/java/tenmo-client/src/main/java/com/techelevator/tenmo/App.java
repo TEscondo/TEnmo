@@ -96,19 +96,15 @@ private static final String API_BASE_URL = "http://localhost:8080/";
 		if(transferId == 0) {
 			System.exit(0);
 		}
-		
-		
-		
 	}
 
-	private void viewPendingRequests() {
-		// TODO Auto-generated method stub
-		
+	private void viewPendingRequests() throws AuthenticationServiceException {
+		authenticationService.viewPending(currentUser.getToken());
 	}
 
 	private void sendBucks() throws Exception {
 		showUsers();
-		int toUserId = console.getUserInputInteger("Enter ID of user you are sending to (0 to cancel)");
+		Integer toUserId = console.getUserInputInteger("Enter ID of user you are sending to (0 to cancel)");
 		if (toUserId != 0) {
 			System.out.println("Enter amount(0.00)");
 			Scanner input = new Scanner(System.in);
@@ -124,8 +120,18 @@ private static final String API_BASE_URL = "http://localhost:8080/";
 		
 	}
 
-	private void requestBucks() {
-		// TODO Auto-generated method stub
+	private void requestBucks() throws Exception {
+		showUsers();
+		int fromUserId = console.getUserInputInteger("Enter ID of user you are requesting from (0 to cancel)");
+		if (fromUserId != 0) {
+			int amount = console.getUserInputInteger("Enter amount");
+			double amountDouble = amount;
+			Transfer transferProcess = new Transfer(fromUserId, amountDouble);
+			authenticationService.newTransfer(currentUser.getToken());
+			System.out.println(amount + " TE Bucks were requested from user " + fromUserId);
+		} else {
+			System.out.println("Cancelling transfer...");
+		}
 		
 	}
 	
