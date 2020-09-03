@@ -1,5 +1,6 @@
 package com.techelevator.tenmo.dao;
 
+import java.math.BigDecimal;
 import java.security.Principal;
 import java.sql.PreparedStatement;
 import java.util.ArrayList;
@@ -107,47 +108,46 @@ public class UserSqlDAO implements UserDAO {
 		return user;
 	}
 
-	@Override
-	public Transfer transfer(Transfer transfer) {
-		String sqlBalance = "SELECT balance FROM accounts WHERE account_id = ?";
+    @Override
+    public Transfer transfer(Transfer transfer) {
+		String sqlBalance = "SELECT balance FROM accounts WHERE account_id = ?;";
 		SqlRowSet rs = jdbcTemplate.queryForRowSet(sqlBalance, transfer.getAccount_from());
-		double transferAmount = transfer.getAmount();
-		double compare = 0.0;
+		BigDecimal transferAmount = transfer.getAmount();
+		BigDecimal compare = null;
 		if (rs.next()) {
-			compare = new Double(rs.getDouble("balance"));
+			compare = new BigDecimal(rs.getString("balance"));
 		}
-		if (transferAmount < compare) {
-			String sql = "INSERT INTO transfers (transfer_type_id, transfer_status_id, account_from, account_to, amount)"
-					+ "VALUES (2,1,?,?,?) RETURNING transfer_id;";
-			SqlRowSet rs2 = jdbcTemplate.queryForRowSet(sql, transfer.getAccount_from(), transfer.getAccount_to(),
-					transfer.getAmount());
+		if (transferAmount.compareTo(compare) == -1) {
+			String sql = "INSERT INTO transfers (transfer_type_id, transfer_status_id, account_from, account_to, amount)" +
+					"VALUES (2,1,?,?,?) RETURNING transfer_id;";
+			SqlRowSet rs2 = jdbcTemplate.queryForRowSet(sql, transfer.getAccount_from(), transfer.getAccount_to(), transfer.getAmount());
 			if (rs2.next()) {
 				transfer.setTransfer_id(rs2.getInt("transfer_id"));
 			}
-
+			
 			return transfer;
-
+			
 		} else {
 			System.out.println("Insufficient funds");
 			return null;
 		}
-
+	
 	}
-
+	
 	private Transfer mapRowToTransfer(SqlRowSet rs) {
 		int transferId = (rs.getInt("transfer_id"));
 		int transferTypeId = (rs.getInt("transfer_type_id"));
 		int transferStatusId = (rs.getInt("transfer_status_id"));
 		int accountFrom = (rs.getInt("account_from"));
 		int accountTo = (rs.getInt("account_to"));
-		double amount = (rs.getDouble("amount"));
-		Transfer transfer = new Transfer(transferId, transferTypeId, transferStatusId, accountFrom, accountTo, amount);
+		BigDecimal amount = (rs.getBigDecimal("amount"));
+		Transfer transfer = new Transfer(transferId, transferTypeId,transferStatusId,accountFrom,accountTo,amount);
 		return transfer;
 	}
 
 	@Override
 	public void viewTransfers() {
-
+		
 		System.out.println("-----------------TRANSFERS-----------------");
 		System.out.println("ID          From/To                 Amount");
 		System.out.println("-------------------------------------------");
@@ -218,7 +218,7 @@ public class UserSqlDAO implements UserDAO {
 			System.out.println("No transfers to view.");
 		}
 	}
-
+	
 	public void viewTransferDetails(int transferId) {
 		int transferTypeId = 0;
 		int transferStatusId = 0;
@@ -227,57 +227,58 @@ public class UserSqlDAO implements UserDAO {
 		double amount = 0.0;
 		String sql = "SELECT * FROM transfers WHERE transfer_id = ?";
 		SqlRowSet row = jdbcTemplate.queryForRowSet(sql, transferId);
-		while (row.next()) {
+		while(row.next()) {
 			transferTypeId = row.getInt("transfer_type_id");
 			transferStatusId = row.getInt("transfer_status_id");
 			accountFrom = row.getInt("account_from");
 			accountTo = row.getInt("account_to");
 			amount = row.getDouble("amount");
 		}
-
-		// get FROM username
+		
+		//get FROM username
 		int userIdFrom = 0;
 		String sql1 = "SELECT user_id FROM accounts WHERE account_id = ?";
 		SqlRowSet row1 = jdbcTemplate.queryForRowSet(sql1, accountFrom);
-		while (row1.next()) {
+		while(row1.next()) {
 			userIdFrom = row1.getInt("user_id");
 		}
-
+		
 		String usernameFrom = "";
 		String sql2 = "SELECT username FROM users WHERE user_id = ?";
 		SqlRowSet row2 = jdbcTemplate.queryForRowSet(sql2, userIdFrom);
-		while (row2.next()) {
+		while(row2.next()) {
 			usernameFrom = row2.getNString("username");
 		}
-
-		// get TO username
+		
+		//get TO username
 		int userIdTo = 0;
 		String sql3 = "SELECT user_id FROM accounts WHERE account_id = ?";
 		SqlRowSet row3 = jdbcTemplate.queryForRowSet(sql3, accountTo);
-		while (row3.next()) {
+		while(row3.next()) {
 			userIdTo = row3.getInt("user_id");
 		}
-
+		
 		String usernameTo = "";
 		String sql4 = "SELECT username FROM users WHERE user_id = ?";
 		SqlRowSet row4 = jdbcTemplate.queryForRowSet(sql4, userIdTo);
-		while (row4.next()) {
+		while(row4.next()) {
 			usernameTo = row4.getNString("username");
 		}
-
-		// get TRANSFER TYPE
-
-		// get TRANSFER STATUS
-
+		
+		//get TRANSFER TYPE
+		
+		
+		//get TRANSFER STATUS
+		
 		System.out.println("--------------------------------------------");
 		System.out.println("Transfer Details");
 		System.out.println("--------------------------------------------");
-
+		
 		System.out.println("Id: " + transferId);
 		System.out.println("From: " + usernameFrom);
 		System.out.println("To: " + usernameTo);
 		System.out.println("");
-
+		
 	}
 
 	@Override
@@ -351,6 +352,30 @@ public class UserSqlDAO implements UserDAO {
 		}
 	}
 
+	public boolean updateBalance(Transfer transfer) {
+		boolean result = false;
+		String sql = "BEGIN TRANSACTION;"
+		+ "UPDATE accounts" +
+		"SET balance = balance +" +
+		"(SELECT amount FROM transfers WHERE transfer_id = ? AND transfer_status = 1)" +
+		"WHERE account_id =" +
+		"(SELECT account_to FROM transfers WHERE transfer_id = ? AND transfer_status = 1);" +
+		"UPDATE accounts" +
+		"SET balance = balance -" + 
+		"(SELECT amount FROM transfers WHERE transfer_id = ? AND transfer_status = 1)" +
+		"WHERE account_id =" +
+		"(SELECT account_from FROM transfers WHERE transfer_id = ? AND transfer_status = 1);" +
+		"UPDATE transfers SET transfer_status_id = 2 WHERE transfer_id = ?;"
+		+ "COMMIT;";
+		
+		int updates = jdbcTemplate.update(sql, transfer.getTransfer_id(), transfer.getTransfer_id(), transfer.getTransfer_id(), transfer.getTransfer_id());
+		if (updates == 3) {
+			result = true;
+
+		}
+		return result;
+	}
+
 	@Override
 	public void updatePending(int optionChoice, long transferId) {
 		if (optionChoice == 1) {
@@ -363,24 +388,6 @@ public class UserSqlDAO implements UserDAO {
 			jdbcTemplate.update(sql, transferId);
 			System.out.println("The request has been rejected.");
 		}
-	}
-
-	public boolean updateBalance(Transfer transfer) {
-		boolean result = false;
-		String sql = "BEGIN TRANSACTION;" + "UPDATE accounts" + "SET balance = balance +"
-				+ "(SELECT amount FROM transfers WHERE transfer_id = ? AND transfer_status = 1)" + "WHERE account_id ="
-				+ "(SELECT account_to FROM transfers WHERE transfer_id = ? AND transfer_status = 1);"
-				+ "UPDATE accounts" + "SET balance = balance -"
-				+ "(SELECT amount FROM transfers WHERE transfer_id = ? AND transfer_status = 1)" + "WHERE account_id ="
-				+ "(SELECT account_from FROM transfers WHERE transfer_id = ? AND transfer_status = 1);"
-				+ "UPDATE transfers SET transfer_status_id = 2 WHERE transfer_id = ?;" + "COMMIT;";
-
-		int updates = jdbcTemplate.update(sql, transfer.getTransfer_id(), transfer.getTransfer_id(),
-				transfer.getTransfer_id(), transfer.getTransfer_id());
-		if (updates == 3) {
-			result = true;
-		}
-		return result;
 	}
 
 }

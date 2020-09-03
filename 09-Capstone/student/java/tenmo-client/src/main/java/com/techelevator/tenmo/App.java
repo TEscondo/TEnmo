@@ -1,5 +1,6 @@
 package com.techelevator.tenmo;
 
+import java.math.BigDecimal;
 import java.util.Scanner;
 
 import org.springframework.http.HttpEntity;
@@ -106,11 +107,10 @@ private static final String API_BASE_URL = "http://localhost:8080/";
 		showUsers();
 		Integer toUserId = console.getUserInputInteger("Enter ID of user you are sending to (0 to cancel)");
 		if (toUserId != 0) {
-			System.out.println("Enter amount(0.00)");
-			Scanner input = new Scanner(System.in);
-			double amount = input.nextDouble();
+			int amount = console.getUserInputInteger("Enter amount");
+			BigDecimal amountBigDec = new BigDecimal(amount); 
 			Integer fromUserId = currentUser.getUser().getId();
-	//		Transfer transferProcess = new Transfer(fromUserId, toUserId, amount);
+			Transfer transferProcess = new Transfer(fromUserId, toUserId, amountBigDec);
 			authenticationService.newTransfer(currentUser.getToken());
 			System.out.println(amount + " TE Bucks were sent to user " + toUserId);
 		} else {
@@ -125,8 +125,9 @@ private static final String API_BASE_URL = "http://localhost:8080/";
 		int fromUserId = console.getUserInputInteger("Enter ID of user you are requesting from (0 to cancel)");
 		if (fromUserId != 0) {
 			int amount = console.getUserInputInteger("Enter amount");
-			double amountDouble = amount;
-			Transfer transferProcess = new Transfer(fromUserId, amountDouble);
+			BigDecimal amountBigDec = new BigDecimal(amount);
+			Integer toUserId = currentUser.getUser().getId();
+			Transfer transferProcess = new Transfer(fromUserId, toUserId, amountBigDec);
 			authenticationService.newTransfer(currentUser.getToken());
 			System.out.println(amount + " TE Bucks were requested from user " + fromUserId);
 		} else {
