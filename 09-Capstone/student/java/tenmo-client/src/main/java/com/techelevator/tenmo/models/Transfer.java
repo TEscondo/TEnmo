@@ -10,9 +10,10 @@ public class Transfer {
 	private int account_to;
 	private int account_from;
 	
-	public Transfer(int account_to, double amount) {
+	public Transfer(int account_from, int account_to, double amount) {
 		this.amount = amount;
 		this.account_to = account_to;
+		this.account_from = account_from;
 			}
 	
 	public int getAccount_from() {
