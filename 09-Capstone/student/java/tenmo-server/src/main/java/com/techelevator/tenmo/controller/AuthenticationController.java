@@ -65,7 +65,7 @@ public class AuthenticationController {
     }
     
     @RequestMapping(value="/transfer", method=RequestMethod.POST)
-    public Transfer transfer(@RequestBody Transfer transfer) {
+    public Transfer newTransfer(@RequestBody Transfer transfer) {
     	Transfer pending = null;
     	pending = userDAO.transfer(transfer);
     	userDAO.updateBalance(pending);
