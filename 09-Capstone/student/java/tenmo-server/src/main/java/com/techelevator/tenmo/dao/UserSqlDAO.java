@@ -20,99 +20,95 @@ import com.techelevator.tenmo.model.User;
 @Service
 public class UserSqlDAO implements UserDAO {
 
-    private static final double STARTING_BALANCE = 1000;
-    private JdbcTemplate jdbcTemplate;
-    private User user = new User();
+	private static final double STARTING_BALANCE = 1000;
+	private JdbcTemplate jdbcTemplate;
+	private User user = new User();
 
-    public UserSqlDAO(JdbcTemplate jdbcTemplate) {
-        this.jdbcTemplate = jdbcTemplate;
-    }
+	public UserSqlDAO(JdbcTemplate jdbcTemplate) {
+		this.jdbcTemplate = jdbcTemplate;
+	}
 
-    @Override
-    public double getBalance(Principal principal) {
-    	String username = principal.getName();
-    	int userId = findIdByUsername(username);
-    	double balance = 0.0;
-    	
-    	String sql = "Select balance from accounts where user_id = ?";
-    	SqlRowSet row = jdbcTemplate.queryForRowSet(sql, userId);
-    	while (row.next()) {
-        	balance = row.getDouble("balance");
+	@Override
+	public double getBalance(Principal principal) {
+		String username = principal.getName();
+		int userId = findIdByUsername(username);
+		double balance = 0.0;
 
-    	}
-    	
-    	return balance;
-    }
-    
-    
-    @Override
-    public int findIdByUsername(String username) {
-        return jdbcTemplate.queryForObject("select user_id from users where username = ?", int.class, username);
-    }
+		String sql = "Select balance from accounts where user_id = ?";
+		SqlRowSet row = jdbcTemplate.queryForRowSet(sql, userId);
+		while (row.next()) {
+			balance = row.getDouble("balance");
+		}
+		return balance;
+	}
 
-    @Override
-    public List<User> findAll() {
-        List<User> users = new ArrayList<>();
-        String sql = "select * from users";
+	@Override
+	public int findIdByUsername(String username) {
+		return jdbcTemplate.queryForObject("select user_id from users where username = ?", int.class, username);
+	}
 
-        SqlRowSet results = jdbcTemplate.queryForRowSet(sql);
-        while(results.next()) {
-            User user = mapRowToUser(results);
-            users.add(user);
-        }
+	@Override
+	public List<User> findAll() {
+		List<User> users = new ArrayList<>();
+		String sql = "select * from users";
 
-        return users;
-    }
+		SqlRowSet results = jdbcTemplate.queryForRowSet(sql);
+		while (results.next()) {
+			User user = mapRowToUser(results);
+			users.add(user);
+		}
 
-    @Override
-    public User findByUsername(String username) throws UsernameNotFoundException {
-        for (User user : this.findAll()) {
-            if( user.getUsername().toLowerCase().equals(username.toLowerCase())) {
-                return user;
-            }
-        }
-        throw new UsernameNotFoundException("User " + username + " was not found.");
-    }
+		return users;
+	}
 
-    @Override
-    public boolean create(String username, String password) {
-        boolean userCreated = false;
-        boolean accountCreated = false;
+	@Override
+	public User findByUsername(String username) throws UsernameNotFoundException {
+		for (User user : this.findAll()) {
+			if (user.getUsername().toLowerCase().equals(username.toLowerCase())) {
+				return user;
+			}
+		}
+		throw new UsernameNotFoundException("User " + username + " was not found.");
+	}
 
-        // create user
-        String insertUser = "insert into users (username,password_hash) values(?,?)";
-        String password_hash = new BCryptPasswordEncoder().encode(password);
+	@Override
+	public boolean create(String username, String password) {
+		boolean userCreated = false;
+		boolean accountCreated = false;
 
-        GeneratedKeyHolder keyHolder = new GeneratedKeyHolder();
-        String id_column = "user_id";
-        userCreated = jdbcTemplate.update(con -> {
-                    PreparedStatement ps = con.prepareStatement(insertUser, new String[]{id_column});
-                    ps.setString(1, username);
-                    ps.setString(2,password_hash);
-                    return ps;
-                }
-                , keyHolder) == 1;
-        int newUserId = (int) keyHolder.getKeys().get(id_column);
+		// create user
+		String insertUser = "insert into users (username,password_hash) values(?,?)";
+		String password_hash = new BCryptPasswordEncoder().encode(password);
 
-        // create account
-        String insertAccount = "insert into accounts (user_id,balance) values(?,?)";
-        accountCreated = jdbcTemplate.update(insertAccount,newUserId,STARTING_BALANCE) == 1;
+		GeneratedKeyHolder keyHolder = new GeneratedKeyHolder();
+		String id_column = "user_id";
+		userCreated = jdbcTemplate.update(con -> {
+			PreparedStatement ps = con.prepareStatement(insertUser, new String[] { id_column });
+			ps.setString(1, username);
+			ps.setString(2, password_hash);
+			return ps;
+		}, keyHolder) == 1;
+		int newUserId = (int) keyHolder.getKeys().get(id_column);
 
-        return userCreated && accountCreated;
-    }
+		// create account
+		String insertAccount = "insert into accounts (user_id,balance) values(?,?)";
+		accountCreated = jdbcTemplate.update(insertAccount, newUserId, STARTING_BALANCE) == 1;
 
-    private User mapRowToUser(SqlRowSet rs) {
-        User user = new User();
-        user.setId(rs.getLong("user_id"));
-        user.setUsername(rs.getString("username"));
-        user.setPassword(rs.getString("password_hash"));
-        user.setActivated(true);
-        user.setAuthorities("ROLE_USER");
-        return user;
-    }
+		return userCreated && accountCreated;
+	}
 
-    @Override
-    public Transfer transfer(Transfer transfer) {
+	private User mapRowToUser(SqlRowSet rs) {
+		User user = new User();
+		user.setId(rs.getLong("user_id"));
+		user.setUsername(rs.getString("username"));
+		user.setPassword(rs.getString("password_hash"));
+		user.setActivated(true);
+		user.setAuthorities("ROLE_USER");
+		return user;
+	}
+
+	@Override
+	public Transfer transfer(Transfer transfer) {
 		String sqlBalance = "SELECT balance FROM accounts WHERE account_id = ?";
 		SqlRowSet rs = jdbcTemplate.queryForRowSet(sqlBalance, transfer.getAccount_from());
 		double transferAmount = transfer.getAmount();
@@ -121,9 +117,10 @@ public class UserSqlDAO implements UserDAO {
 			compare = new Double(rs.getDouble("balance"));
 		}
 		if (transferAmount < compare) {
-			String sql = "INSERT INTO transfers (transfer_type_id, transfer_status_id, account_from, account_to, amount)" +
-					"VALUES (2,1,?,?,?) RETURNING transfer_id;";
-			SqlRowSet rs2 = jdbcTemplate.queryForRowSet(sql, transfer.getAccount_from(), transfer.getAccount_to(), transfer.getAmount());
+			String sql = "INSERT INTO transfers (transfer_type_id, transfer_status_id, account_from, account_to, amount)"
+					+ "VALUES (2,1,?,?,?) RETURNING transfer_id;";
+			SqlRowSet rs2 = jdbcTemplate.queryForRowSet(sql, transfer.getAccount_from(), transfer.getAccount_to(),
+					transfer.getAmount());
 			if (rs2.next()) {
 				transfer.setTransfer_id(rs2.getInt("transfer_id"));
 			}
@@ -157,66 +154,66 @@ public class UserSqlDAO implements UserDAO {
 
 		// GET TRANSFERS FROM YOUR ACCOUNT TO ANOTHER ACCOUNT
 		try {
-		int accountId = 0;
-		long userId = user.getId();
-		String sqlForAccountId = "SELECT account_id FROM accounts WHERE user_id = ?";
-		SqlRowSet rowsetForAccountId = jdbcTemplate.queryForRowSet(sqlForAccountId, userId);
-		while (rowsetForAccountId.next()) {
-			accountId = rowsetForAccountId.getInt("account_id");
-		}
+			int accountId = 0;
+			long userId = user.getId();
+			String sqlForAccountId = "SELECT account_id FROM accounts WHERE user_id = ?";
+			SqlRowSet rowsetForAccountId = jdbcTemplate.queryForRowSet(sqlForAccountId, userId);
+			while (rowsetForAccountId.next()) {
+				accountId = rowsetForAccountId.getInt("account_id");
+			}
 
-		int transferId = 0;
-		double amount = 0.0;
-		int accountIdToUser = 0;
-		String sql = "SELECT transfer_id, account_to, amount FROM transfers WHERE account_from = ?";
-		SqlRowSet row = jdbcTemplate.queryForRowSet(sql, accountId);
-		while (row.next()) {
-			transferId = row.getInt("transfer_id");
-			amount = row.getDouble("amount");
-			accountIdToUser = row.getInt("account_to");
-		}
+			int transferId = 0;
+			double amount = 0.0;
+			int accountIdToUser = 0;
+			String sql = "SELECT transfer_id, account_to, amount FROM transfers WHERE account_from = ?";
+			SqlRowSet row = jdbcTemplate.queryForRowSet(sql, accountId);
+			while (row.next()) {
+				transferId = row.getInt("transfer_id");
+				amount = row.getDouble("amount");
+				accountIdToUser = row.getInt("account_to");
+			}
 
-		int userIdToUser = 0;
-		String sql1 = "SELECT user_id FROM accounts WHERE account_id = ?";
-		SqlRowSet rowset = jdbcTemplate.queryForRowSet(sql1, accountIdToUser);
-		while (rowset.next()) {
-			userIdToUser = rowset.getInt("user_id");
-		}
+			int userIdToUser = 0;
+			String sql1 = "SELECT user_id FROM accounts WHERE account_id = ?";
+			SqlRowSet rowset = jdbcTemplate.queryForRowSet(sql1, accountIdToUser);
+			while (rowset.next()) {
+				userIdToUser = rowset.getInt("user_id");
+			}
 
-		String usernameToUser = "";
-		String sql2 = "SELECT username FROM users WHERE user_id = ?";
-		SqlRowSet rowset1 = jdbcTemplate.queryForRowSet(sql2, userIdToUser);
-		while (rowset1.next()) {
-			usernameToUser = rowset1.getNString("username");
-		}
+			String usernameToUser = "";
+			String sql2 = "SELECT username FROM users WHERE user_id = ?";
+			SqlRowSet rowset1 = jdbcTemplate.queryForRowSet(sql2, userIdToUser);
+			while (rowset1.next()) {
+				usernameToUser = rowset1.getNString("username");
+			}
 
-		System.out.println(transferId + "          To: " + usernameToUser + "          $ " + amount);
+			System.out.println(transferId + "          To: " + usernameToUser + "          $ " + amount);
 
-		// GET TRANSFERS TO YOUR ACCOUNT FROM ANOTHER ACCOUNT
-		int accountIdFromUser = 0;
-		String sql3 = "SELECT transfer_id, account_from, amount FROM transfers WHERE account_to = ?";
-		SqlRowSet row3 = jdbcTemplate.queryForRowSet(sql3, accountId);
-		while (row3.next()) {
-			transferId = row.getInt("transfer_id");
-			amount = row.getDouble("amount");
-			accountIdFromUser = row.getInt("account_from");
-		}
+			// GET TRANSFERS TO YOUR ACCOUNT FROM ANOTHER ACCOUNT
+			int accountIdFromUser = 0;
+			String sql3 = "SELECT transfer_id, account_from, amount FROM transfers WHERE account_to = ?";
+			SqlRowSet row3 = jdbcTemplate.queryForRowSet(sql3, accountId);
+			while (row3.next()) {
+				transferId = row.getInt("transfer_id");
+				amount = row.getDouble("amount");
+				accountIdFromUser = row.getInt("account_from");
+			}
 
-		int userIdFromUser = 0;
-		String sql4 = "SELECT user_id FROM accounts WHERE account_id = ?";
-		SqlRowSet row4 = jdbcTemplate.queryForRowSet(sql4, accountIdFromUser);
-		while (row4.next()) {
-			userIdFromUser = row4.getInt("user_id");
-		}
+			int userIdFromUser = 0;
+			String sql4 = "SELECT user_id FROM accounts WHERE account_id = ?";
+			SqlRowSet row4 = jdbcTemplate.queryForRowSet(sql4, accountIdFromUser);
+			while (row4.next()) {
+				userIdFromUser = row4.getInt("user_id");
+			}
 
-		String usernameFromUser = "";
-		String sql5 = "SELECT username FROM users WHERE user_id = ?";
-		SqlRowSet row5 = jdbcTemplate.queryForRowSet(sql5, userIdFromUser);
-		while (row5.next()) {
-			usernameFromUser = row5.getNString("username");
-		}
+			String usernameFromUser = "";
+			String sql5 = "SELECT username FROM users WHERE user_id = ?";
+			SqlRowSet row5 = jdbcTemplate.queryForRowSet(sql5, userIdFromUser);
+			while (row5.next()) {
+				usernameFromUser = row5.getNString("username");
+			}
 
-		System.out.println(transferId + "          From: " + usernameFromUser + "          $ " + amount);
+			System.out.println(transferId + "          From: " + usernameFromUser + "          $ " + amount);
 		} catch (NullPointerException e) {
 			System.out.println("No transfers to view.");
 		}
@@ -289,36 +286,40 @@ public class UserSqlDAO implements UserDAO {
 		System.out.println("ID          To                     Amount");
 		System.out.println("-------------------------------------------");
 
+		long transferId = 0;
 		try {
-		int transferId = 0;
-		int accountIdTo = 0;
-		double amount = 0.0;
-		Long userId = user.getId();
-		String sql = "SELECT transfer_id, account_to, amount FROM transfers WHERE account_from = ?";
-		SqlRowSet row = jdbcTemplate.queryForRowSet(sql, userId);
-		while (row.next()) {
-			transferId = row.getInt("transfer_id");
-			accountIdTo = row.getInt("account_to");
-			amount = row.getDouble("amount");
-		}
+			long accountIdTo = 0;
+			double amount = 0.0;
+			long userId = user.getId();
+			String sql = "SELECT transfer_id, account_to, amount FROM transfers WHERE account_from = ? AND transfer_status_id = 1";
+			SqlRowSet row = jdbcTemplate.queryForRowSet(sql, userId);
+			while (row.next()) {
+				transferId = row.getLong("transfer_id");
+				accountIdTo = row.getLong("account_to");
+				amount = row.getDouble("amount");
+			}
 
-		int userIdTo = 0;
-		String sql1 = "SELECT user_id FROM accounts WHERE account_id = ?";
-		SqlRowSet row1 = jdbcTemplate.queryForRowSet(sql1, accountIdTo);
-		while (row1.next()) {
-			userIdTo = row1.getInt("user_id");
-		}
+			long userIdTo = 0;
+			String sql1 = "SELECT user_id FROM accounts WHERE account_id = ?";
+			SqlRowSet row1 = jdbcTemplate.queryForRowSet(sql1, accountIdTo);
+			while (row1.next()) {
+				userIdTo = row1.getLong("user_id");
+			}
 
-		String usernameTo = "";
-		String sql2 = "SELECT username FROM users WHERE user_id = ?";
-		SqlRowSet row2 = jdbcTemplate.queryForRowSet(sql2, userIdTo);
-		while (row2.next()) {
-			usernameTo = row2.getNString("username");
-		}
+			String usernameTo = "";
+			String sql2 = "SELECT username FROM users WHERE user_id = ?";
+			SqlRowSet row2 = jdbcTemplate.queryForRowSet(sql2, userIdTo);
+			while (row2.next()) {
+				usernameTo = row2.getNString("username");
+			}
 
-		System.out.println(transferId + "          " + usernameTo + "                $" + amount);
-		System.out.println("---------");
-		System.out.println("Please enter transfer ID to approve/reject (0 to cancel): ");
+			System.out.println(transferId + "          " + usernameTo + "                $" + amount);
+			System.out.println("---------");
+			System.out.println("Please enter transfer ID to approve/reject (0 to cancel): ");
+		} catch (NullPointerException e) {
+		} catch (NoSuchElementException e) {
+		}
+		try {
 		Scanner scanner = new Scanner(System.in);
 		String inputTransferId = scanner.nextLine();
 		int transferIdChoice = 0;
@@ -335,7 +336,7 @@ public class UserSqlDAO implements UserDAO {
 			System.out.println("Please choose an option: ");
 			String inputOption = scanner.nextLine();
 			int optionChoice = 0;
-			try { 
+			try {
 				optionChoice = Integer.parseInt(inputOption);
 			} catch (NumberFormatException e) {
 				System.out.println("Invalid input.");
@@ -345,12 +346,13 @@ public class UserSqlDAO implements UserDAO {
 			System.out.println("Cancelling...");
 		}
 		scanner.close();
-		}catch (NoSuchElementException e) {
+		} catch (NoSuchElementException e) {
+			
 		}
 	}
 
 	@Override
-	public void updatePending(int optionChoice, int transferId) {
+	public void updatePending(int optionChoice, long transferId) {
 		if (optionChoice == 1) {
 			String sql = "UPDATE transfers SET transfer_status_id = 2 WHERE transfer_id = ?";
 			jdbcTemplate.update(sql, transferId);

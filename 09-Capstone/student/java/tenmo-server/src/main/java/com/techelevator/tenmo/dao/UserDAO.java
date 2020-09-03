@@ -8,7 +8,7 @@ import java.util.List;
 
 public interface UserDAO {
 
-	void updatePending(int optionChoice, int transferId);
+	void updatePending(int optionChoice, long transferId);
 
 	void viewTransferDetails(int transferId);
 	

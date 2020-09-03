@@ -110,7 +110,7 @@ private static final String API_BASE_URL = "http://localhost:8080/";
 			Scanner input = new Scanner(System.in);
 			double amount = input.nextDouble();
 			Integer fromUserId = currentUser.getUser().getId();
-			Transfer transferProcess = new Transfer(fromUserId, toUserId, amount);
+	//		Transfer transferProcess = new Transfer(fromUserId, toUserId, amount);
 			authenticationService.newTransfer(currentUser.getToken());
 			System.out.println(amount + " TE Bucks were sent to user " + toUserId);
 		} else {
