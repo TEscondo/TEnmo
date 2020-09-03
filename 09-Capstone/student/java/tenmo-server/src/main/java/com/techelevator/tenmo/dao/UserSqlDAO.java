@@ -148,7 +148,7 @@ public class UserSqlDAO implements UserDAO {
 
 	@Override
 	public void viewTransfers() {
-		try {
+		
 		System.out.println("-----------------TRANSFERS-----------------");
 		System.out.println("ID          From/To                 Amount");
 		System.out.println("-------------------------------------------");
@@ -215,9 +215,6 @@ public class UserSqlDAO implements UserDAO {
 		}
 		
 		System.out.println(transferId + "          From: " + usernameFromUser + "          $ " + amount);
-		} catch (NullPointerException e) {
-			System.out.println("No transfer history available.");
-		}
 	}
 	
 	public void viewTransferDetails(int transferId) {
@@ -267,20 +264,9 @@ public class UserSqlDAO implements UserDAO {
 		}
 		
 		//get TRANSFER TYPE
-		String transferTypeDesc = "";
-		String sql5 = "SELECT transfer_type_desc FROM transfer_types WHERE transfer_type_id = ?";
-		SqlRowSet row5 = jdbcTemplate.queryForRowSet(sql5, transferTypeId);
-		while(row5.next()) {
-			transferTypeDesc = row5.getNString("transfer_type_desc");
-		}
+		
 		
 		//get TRANSFER STATUS
-		String transferStatusDesc = "";
-		String sql6 = "SELECT transfer_status_desc FROM transfer_statuses WHERE transfer_status_id = ?";
-		SqlRowSet row6 = jdbcTemplate.queryForRowSet(sql6, transferStatusId);
-		while(row6.next()) {
-			transferStatusDesc = row6.getNString("transfer_status_desc");
-		}
 		
 		System.out.println("--------------------------------------------");
 		System.out.println("Transfer Details");
@@ -289,9 +275,7 @@ public class UserSqlDAO implements UserDAO {
 		System.out.println("Id: " + transferId);
 		System.out.println("From: " + usernameFrom);
 		System.out.println("To: " + usernameTo);
-		System.out.println("Type: " + transferTypeDesc);
-		System.out.println("Status: " + transferStatusDesc);
-		System.out.println("Amount: $" + amount);
+		System.out.println("");
 		
 	}
 

@@ -126,9 +126,14 @@ public class AuthenticationService {
 	  }
 	  
 
-	  public User[] getUsers(String token) {
+	  public User[] getUsers(String token) throws AuthenticationServiceException {
 		  AUTH_TOKEN = token;
-		  User[] users = restTemplate.exchange(BASE_URL + "account/allaccounts", HttpMethod.GET, makeAuthEntity(), User[].class).getBody();
+		  User[] users;
+		  try {
+			  users = restTemplate.exchange(BASE_URL + "account/allaccounts", HttpMethod.GET, makeAuthEntity(), User[].class).getBody();			  
+		  } catch (RestClientResponseException ex) {
+	            throw new AuthenticationServiceException(ex.getRawStatusCode() + " : " + ex.getResponseBodyAsString());
+	        }
 		  return users;
 	  }
 	  

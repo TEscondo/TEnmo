@@ -1,6 +1,7 @@
 package com.techelevator.tenmo.controller;
 
 import java.security.Principal;
+import java.util.List;
 
 import javax.validation.Valid;
 
@@ -90,6 +91,15 @@ public class AuthenticationController {
         return new ResponseEntity<>(new LoginResponse(jwt, user), httpHeaders, HttpStatus.OK);
     }
 
+    @RequestMapping(value = "/account/allaccounts", method = RequestMethod.GET)
+    public List<User> getAccount(Principal principal) {
+    	return userDAO.findAll();
+    }
+    
+    
+    
+    
+    
     @PreAuthorize("permitAll")
     @ResponseStatus(HttpStatus.CREATED)
     @RequestMapping(value = "/register", method = RequestMethod.POST)

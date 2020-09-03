@@ -38,7 +38,7 @@ private static final String API_BASE_URL = "http://localhost:8080/";
     private AuthenticationService authenticationService;
     public RestTemplate rest = new RestTemplate();
 
-    public static void main(String[] args) throws AuthenticationServiceException {
+    public static void main(String[] args) throws Exception {
     	App app = new App(new ConsoleService(System.in, System.out), new AuthenticationService(API_BASE_URL));
     	app.run();
     }
@@ -48,7 +48,7 @@ private static final String API_BASE_URL = "http://localhost:8080/";
 		this.authenticationService = authenticationService;
 	}
 
-	public void run() throws AuthenticationServiceException {
+	public void run() throws Exception {
 		System.out.println("*********************");
 		System.out.println("* Welcome to TEnmo! *");
 		System.out.println("*********************");
@@ -57,7 +57,7 @@ private static final String API_BASE_URL = "http://localhost:8080/";
 		mainMenu();
 	}
 
-	private void mainMenu() throws AuthenticationServiceException {
+	private void mainMenu() throws Exception {
 		while(true) {
 			String choice = (String)console.getChoiceFromOptions(MAIN_MENU_OPTIONS);
 			if(MAIN_MENU_OPTION_VIEW_BALANCE.equals(choice)) {
@@ -106,21 +106,17 @@ private static final String API_BASE_URL = "http://localhost:8080/";
 		
 	}
 
-	private void sendBucks() throws AuthenticationServiceException {
+	private void sendBucks() throws Exception {
 		showUsers();
-		System.out.println("Enter ID number of user you are sending funds to (0 to cancel)");
-		Scanner input = new Scanner(System.in);
-		int userId = input.nextInt();
-		if (userId != 0) {
-			System.out.println("How much will you send?");
-			Scanner amountInput = new Scanner(System.in);
-			double amount = amountInput.nextDouble();
-			Transfer transferProcess = new Transfer(userId, amount);
+		int toUserId = console.getUserInputInteger("Enter ID of user you are sending to (0 to cancel)");
+		if (toUserId != 0) {
+			int amount = console.getUserInputInteger("Enter amount");
+			double amountDouble = amount;
+			Transfer transferProcess = new Transfer(toUserId, amountDouble);
 			authenticationService.newTransfer(currentUser.getToken());
-			System.out.println(amount + " TE BUCKS were sent to ID: " + userId);
-		}
-		else {
-			System.out.println("Cancel transfer");
+			System.out.println(amount + " TE Bucks were sent to user " + toUserId);
+		} else {
+			System.out.println("Cancelling transfer...");
 		}
 	
 		
@@ -191,7 +187,7 @@ private static final String API_BASE_URL = "http://localhost:8080/";
 		return new UserCredentials(username, password);
 	}
 
-	public void showUsers() {
+	public void showUsers() throws Exception {
 		System.out.println("--------------------------");
 		System.out.println("Users");
 		System.out.println("ID     NAME");
