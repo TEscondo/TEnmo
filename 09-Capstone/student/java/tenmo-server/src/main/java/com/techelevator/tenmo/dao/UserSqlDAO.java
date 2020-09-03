@@ -111,7 +111,7 @@ public class UserSqlDAO implements UserDAO {
 
     @Override
     public Transfer transfer(Transfer transfer) {
-		String sqlBalance = "SELECT balance FROM accounts WHERE account_id = ?";
+		String sqlBalance = "SELECT balance FROM accounts WHERE account_id = ?;";
 		SqlRowSet rs = jdbcTemplate.queryForRowSet(sqlBalance, transfer.getAccount_from());
 		double transferAmount = transfer.getAmount();
 		double compare = 0.0;
@@ -120,7 +120,7 @@ public class UserSqlDAO implements UserDAO {
 		}
 		if (transferAmount < compare) {
 			String sql = "INSERT INTO transfers (transfer_type_id, transfer_status_id, account_from, account_to, amount)" +
-					"VALUES (2,1,?,?,?) RETURNING transfer_id";
+					"VALUES (2,1,?,?,?) RETURNING transfer_id;";
 			SqlRowSet rs2 = jdbcTemplate.queryForRowSet(sql, transfer.getAccount_from(), transfer.getAccount_to(), transfer.getAmount());
 			if (rs2.next()) {
 				transfer.setTransfer_id(rs2.getInt("transfer_id"));
