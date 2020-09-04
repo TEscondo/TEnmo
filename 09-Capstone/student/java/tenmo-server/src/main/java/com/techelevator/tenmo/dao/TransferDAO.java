@@ -6,9 +6,9 @@ import com.techelevator.tenmo.model.TransferBack;
 
 public interface TransferDAO {
 
-	void updatePending(int optionChoice, long transferId);
+	void updatePending(int optionChoice, int transferId);
 
-	void viewTransferDetails(int transferId);
+	Transfer viewTransferDetails(int transferId);
 	
 	List<TransferBack> viewTransfers(int id);
 	
@@ -16,7 +16,7 @@ public interface TransferDAO {
 	
 	boolean updateBalance(Transfer transfer);
 	
-	void viewPending();
+	List<TransferBack> viewPending (int id);
 
 	boolean updateBalance1(Transfer transfer);
 }
