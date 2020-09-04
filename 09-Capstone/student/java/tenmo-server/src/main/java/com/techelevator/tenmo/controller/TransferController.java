@@ -48,6 +48,7 @@ public class TransferController {
 		 
 	    	transferDAO.transfer(transfer);
 	    	transferDAO.updateBalance(transfer);
+	    	transferDAO.updateBalance1(transfer);
 	    }
 	 
 	  @RequestMapping(value="/transfer", method=RequestMethod.PUT)

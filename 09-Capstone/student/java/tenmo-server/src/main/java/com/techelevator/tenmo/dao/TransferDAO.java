@@ -14,4 +14,6 @@ public interface TransferDAO {
 	boolean updateBalance(Transfer transfer);
 	
 	void viewPending();
+
+	boolean updateBalance1(Transfer transfer);
 }

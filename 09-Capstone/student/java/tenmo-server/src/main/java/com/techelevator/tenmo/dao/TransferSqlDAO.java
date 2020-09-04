@@ -228,13 +228,31 @@ public void viewTransfers() {
 		
 		String sql1 = "UPDATE accounts SET balance = ? WHERE account_id = ?";
 		SqlRowSet row1 = jdbcTemplate.queryForRowSet(sql1, newAmt, accountTo);
+		} catch (Exception e) {
+			itWorked = false;
+		}
+		return itWorked;
+	}
+		
+		
+	@Override
+	public boolean updateBalance1(Transfer transfer) {
+		
+		boolean itWorked = true;
+		
+		int transferId = transfer.getTransfer_id();
+		Double amount = transfer.getAmount();
+		int accountFrom = transfer.getAccount_from();
+		int accountTo = transfer.getAccount_to();
+		
+		try {
 		
 		// update balance for accountFrom
 		Double orgBalance1 = 0.0;
 		String sql2 = "SELECT balance FROM accounts WHERE account_id = ?";
 		SqlRowSet row2 = jdbcTemplate.queryForRowSet(sql2, accountFrom);
 		while(row2.next()) {
-			orgBalance1 = row.getDouble("balance");
+			orgBalance1 = row2.getDouble("balance");
 		}
 		Double newAmt1 = orgBalance1 - amount;
 		
@@ -244,12 +262,12 @@ public void viewTransfers() {
 		// update transfer status
 		String  sql4 = "UPDATE transfers SET transfer_status_id = 2 WHERE transfer_id = ?";
 		SqlRowSet row4 = jdbcTemplate.queryForRowSet(sql4, transferId);
-		
 		} catch (Exception e) {
 			itWorked = false;
 		}
 		return itWorked;
 	}
+		
 	
 	private Transfer mapRowToTransfer(SqlRowSet rs) {
 		int transferId = (rs.getInt("transfer_id"));
