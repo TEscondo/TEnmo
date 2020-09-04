@@ -176,16 +176,20 @@ public void viewTransfers() {
 
 	@Override
 	public Transfer transfer(Transfer transfer) {
+		double balance = 0;
 		String sqlBalance = "SELECT balance FROM accounts WHERE account_id = ?;";
 		SqlRowSet rs = jdbcTemplate.queryForRowSet(sqlBalance, transfer.getAccount_from());
-		BigDecimal transferAmount = transfer.getAmount();
-		BigDecimal compare = null;
-		if (rs.next()) {
-			compare = new BigDecimal(rs.getString("balance"));
+		while(rs.next()) {
+			balance = rs.getDouble("balance");
 		}
-		if (transferAmount.compareTo(compare) == -1) {
+		double transferAmount = transfer.getAmount();
+//		BigDecimal compare = null;
+//		if (rs.next()) {
+//			compare = new BigDecimal(rs.getString("balance"));
+//		}
+		if (transferAmount < balance ) {
 			String sql = "INSERT INTO transfers (transfer_type_id, transfer_status_id, account_from, account_to, amount)" +
-					"VALUES (2,1,?,?,?) RETURNING transfer_id;";
+					"VALUES (2,1,?,?,?) RETURNING transfer_id";
 			SqlRowSet rs2 = jdbcTemplate.queryForRowSet(sql, transfer.getAccount_from(), transfer.getAccount_to(), transfer.getAmount());
 			if (rs2.next()) {
 				transfer.setTransfer_id(rs2.getInt("transfer_id"));
@@ -202,34 +206,58 @@ public void viewTransfers() {
 
 	@Override
 	public boolean updateBalance(Transfer transfer) {
-		boolean result = false;
-		String sql = 
-		 "UPDATE accounts" +
-		"SET balance = balance +" +
-		"(SELECT amount FROM transfers WHERE transfer_id = ? AND transfer_status = 1)" +
-		"WHERE account_id =" +
-		"(SELECT account_to FROM transfers WHERE transfer_id = ? AND transfer_status = 1);" ;
-//		"UPDATE accounts" +
-//		"SET balance = balance -" + 
-//		"(SELECT amount FROM transfers WHERE transfer_id = ? AND transfer_status = 1)" +
-//		"WHERE account_id =" +
-//		"(SELECT account_from FROM transfers WHERE transfer_id = ? AND transfer_status = 1);" +
-//		"UPDATE transfers SET transfer_status_id = 2 WHERE transfer_id = ?";
 		
-		int updates = jdbcTemplate.update(sql, transfer.getTransfer_id(), transfer.getTransfer_id(), transfer.getTransfer_id(), transfer.getTransfer_id(), transfer.getTransfer_id());
-		if (updates == 3) {
-			result = true;
-
+		boolean itWorked = true;
+		
+		int transferId = transfer.getTransfer_id();
+		double amount = transfer.getAmount();
+		int accountFrom = transfer.getAccount_from();
+		int accountTo = transfer.getAccount_to();
+		
+		try {
+		// update balance for accountTo
+		double orgBalance = 0;
+		String sql = "SELECT balance FROM accounts WHERE account_id = ?";
+		SqlRowSet row = jdbcTemplate.queryForRowSet(sql, accountTo);
+		while(row.next()){
+			orgBalance = row.getDouble("balance");
 		}
-		return result;
+		
+		double newAmt = orgBalance + amount;
+		
+		String sql1 = "UPDATE accounts SET balance = ?";
+		SqlRowSet row1 = jdbcTemplate.queryForRowSet(sql1, newAmt);
+		
+		// update balance for accountFrom
+		
+		double orgBalance1 = 0;
+		String sql2 = "SELECT balance FROM accounts WHERE account_id = ?";
+		SqlRowSet row2 = jdbcTemplate.queryForRowSet(sql2, accountFrom);
+		while(row2.next()) {
+			orgBalance1 = row.getDouble("balance");
+		}
+		double newAmt1 = orgBalance1 - amount;
+		
+		String sql3 = "UPDATE accounts SET balance = ?";
+		SqlRowSet row3 = jdbcTemplate.queryForRowSet(sql3, newAmt1);
+		
+		// update transfer status
+		String  sql4 = "UPDATE transfers SET transfer_status_id = 2 WHERE transfer_id = ?";
+		SqlRowSet row4 = jdbcTemplate.queryForRowSet(sql4, transferId);
+		
+		}catch (Exception e) {
+			itWorked = false;
+		}
+		return itWorked;
 	}
+	
 	private Transfer mapRowToTransfer(SqlRowSet rs) {
 		int transferId = (rs.getInt("transfer_id"));
 		int transferTypeId = (rs.getInt("transfer_type_id"));
 		int transferStatusId = (rs.getInt("transfer_status_id"));
 		int accountFrom = (rs.getInt("account_from"));
 		int accountTo = (rs.getInt("account_to"));
-		BigDecimal amount = (rs.getBigDecimal("amount"));
+		int amount = (rs.getInt("amount"));
 		Transfer transfer = new Transfer(transferId, transferTypeId,transferStatusId,accountFrom,accountTo,amount);
 		return transfer;
 	}

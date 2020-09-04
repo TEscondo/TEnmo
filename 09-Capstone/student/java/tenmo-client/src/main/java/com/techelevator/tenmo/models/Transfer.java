@@ -8,11 +8,11 @@ public class Transfer {
 	private int transfer_id;
 	private int transfer_type_id;
 	private int transfer_status_id;
-	private int amount;
+	private double amount;
 	private int account_to;
 	private int account_from;
 	
-	public Transfer(int account_from, int account_to, int amount) {
+	public Transfer(int account_from, int account_to, double amount) {
 		this.amount = amount;
 		this.account_to = account_to;
 		this.account_from = account_from;
@@ -26,10 +26,10 @@ public class Transfer {
 		this.account_from = account_from;
 	}
 
-	public int getAmount() {
+	public double getAmount() {
 		return amount;
 	}
-	public void setAmount(int amount) {
+	public void setAmount(double amount) {
 		this.amount = amount;
 	}
 	public int getAccount_to() {
