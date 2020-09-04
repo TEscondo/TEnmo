@@ -5,6 +5,13 @@ import java.math.BigDecimal;
 public class Transfer {
 
 	
+	@Override
+	public String toString() {
+		return "Transfer [transfer_id=" + transfer_id + ", transfer_type_id=" + transfer_type_id
+				+ ", transfer_status_id=" + transfer_status_id + ", amount=" + amount + ", account_to=" + account_to
+				+ ", account_from=" + account_from + "]";
+	}
+
 	private int transfer_id;
 	private int transfer_type_id;
 	private int transfer_status_id;

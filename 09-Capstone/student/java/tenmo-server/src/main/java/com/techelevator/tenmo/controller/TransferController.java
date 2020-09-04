@@ -12,12 +12,12 @@ import com.techelevator.tenmo.dao.TransferDAO;
 import com.techelevator.tenmo.dao.UserDAO;
 import com.techelevator.tenmo.model.Transfer;
 
-@Component
 @PreAuthorize("isAuthenticated()")
 @RestController
 public class TransferController {
-
+	@Autowired
 	private TransferDAO transferDAO;
+	@Autowired
 	private UserDAO userDAO;
 	private Transfer transfer;
 
@@ -25,7 +25,7 @@ public class TransferController {
 //	public TransferController(TransferDAO transferDAO) {
 //		this.transferDAO = transferDAO;
 //	}
-//	
+	
 	@RequestMapping(value="/transfers",method=RequestMethod.GET)
     public void viewTransfers() {
     	transferDAO.viewTransfers();
@@ -38,6 +38,12 @@ public class TransferController {
 	
 	 @RequestMapping(value="/transfer", method=RequestMethod.POST)
 	    public Transfer newTransfer(@RequestBody Transfer transfer) {
+		 
+		 	
+		 	System.out.println("Here is the JSON I'm deserializing:");
+		 	System.out.println(transfer);
+		 
+		 
 	    	Transfer pending = null;
 	    	pending = transferDAO.transfer(transfer);
 	    	transferDAO.updateBalance(pending);

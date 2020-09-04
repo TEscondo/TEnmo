@@ -108,10 +108,10 @@ private static final String API_BASE_URL = "http://localhost:8080/";
 		Integer toUserId = console.getUserInputInteger("Enter ID of user you are sending to (0 to cancel)");
 		if (toUserId != 0) {
 			int amount = console.getUserInputInteger("Enter amount");
-			BigDecimal amountBigDec = new BigDecimal(amount); 
+//			BigDecimal amountBigDec = new BigDecimal(amount); 
 			Integer fromUserId = currentUser.getUser().getId();
-			Transfer transferProcess = new Transfer(fromUserId, toUserId, amountBigDec);
-			authenticationService.newTransfer(currentUser.getToken());
+			Transfer transferProcess = new Transfer(fromUserId, toUserId, amount);
+			authenticationService.newTransfer(currentUser.getToken(), transferProcess);
 			System.out.println(amount + " TE Bucks were sent to user " + toUserId);
 		} else {
 			System.out.println("Cancelling transfer...");
@@ -127,8 +127,9 @@ private static final String API_BASE_URL = "http://localhost:8080/";
 			int amount = console.getUserInputInteger("Enter amount");
 			BigDecimal amountBigDec = new BigDecimal(amount);
 			Integer toUserId = currentUser.getUser().getId();
-			Transfer transferProcess = new Transfer(fromUserId, toUserId, amountBigDec);
-			authenticationService.newTransfer(currentUser.getToken());
+//			Transfer transferProcess = new Transfer(fromUserId, toUserId, amountBigDec);
+			//TODO: Revisit
+//			authenticationService.newTransfer(currentUser.getToken(), transferProcess);
 			System.out.println(amount + " TE Bucks were requested from user " + fromUserId);
 		} else {
 			System.out.println("Cancelling transfer...");
