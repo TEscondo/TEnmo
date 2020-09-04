@@ -37,17 +37,17 @@ public class TransferController {
 	    }
 	
 	 @RequestMapping(value="/transfer", method=RequestMethod.POST)
-	    public Transfer newTransfer(@RequestBody Transfer transfer) {
+	    public void newTransfer(@RequestBody Transfer transfer) {
 		 
 		 	
 		 	System.out.println("Here is the JSON I'm deserializing:");
 		 	System.out.println(transfer);
 		 
 		 
-	    	Transfer pending = null;
-	    	pending = transferDAO.transfer(transfer);
-	    	transferDAO.updateBalance(pending);
-	    	return pending;
+//	    	Transfer pending = null;
+	    	transferDAO.transfer(transfer);
+	    	transferDAO.updateBalance(transfer);
+//	    	return pending;
 	    }
 	 
 	  @RequestMapping(value="/transfer", method=RequestMethod.PUT)

@@ -8,11 +8,24 @@ public class Transfer {
 	private int transfer_id;
 	private int transfer_type_id;
 	private int transfer_status_id;
-	private double amount;
+	private Double amount;
 	private int account_to;
 	private int account_from;
+
 	
-	public Transfer(int account_from, int account_to, double amount) {
+	
+	public Transfer(int transfer_id, int transfer_type_id, int transfer_status_id, Double amount, int account_to,
+			int account_from) {
+		super();
+		this.transfer_id = transfer_id;
+		this.transfer_type_id = transfer_type_id;
+		this.transfer_status_id = transfer_status_id;
+		this.amount = amount;
+		this.account_to = account_to;
+		this.account_from = account_from;
+	}
+
+	public Transfer(int account_from, int account_to, Double amount) {
 		this.amount = amount;
 		this.account_to = account_to;
 		this.account_from = account_from;
@@ -26,10 +39,10 @@ public class Transfer {
 		this.account_from = account_from;
 	}
 
-	public double getAmount() {
+	public Double getAmount() {
 		return amount;
 	}
-	public void setAmount(double amount) {
+	public void setAmount(Double amount) {
 		this.amount = amount;
 	}
 	public int getAccount_to() {

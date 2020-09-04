@@ -107,7 +107,7 @@ private static final String API_BASE_URL = "http://localhost:8080/";
 		showUsers();
 		Integer toUserId = console.getUserInputInteger("Enter ID of user you are sending to (0 to cancel)");
 		if (toUserId != 0) {
-			int amount = console.getUserInputInteger("Enter amount");
+			Double amount = console.getUserInputDouble("Enter amount");
 			Integer fromUserId = currentUser.getUser().getId();
 			Transfer transferProcess = new Transfer(fromUserId, toUserId, amount);
 			authenticationService.newTransfer(currentUser.getToken(), transferProcess);

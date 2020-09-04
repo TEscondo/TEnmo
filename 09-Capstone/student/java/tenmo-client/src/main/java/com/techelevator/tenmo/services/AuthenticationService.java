@@ -96,7 +96,7 @@ public class AuthenticationService {
 	        }
 			return balance;
 	    }
-	
+	  
 	  private HttpEntity makeAuthEntity() {
 	        HttpHeaders headers = new HttpHeaders();
 	        headers.setBearerAuth(AUTH_TOKEN);
@@ -111,15 +111,15 @@ public class AuthenticationService {
 				return entity;
 			}
 	  
-	  public Transfer newTransfer(String token, Transfer transferBody) throws AuthenticationServiceException {
+	  public void newTransfer(String token, Transfer transferBody) throws AuthenticationServiceException {
 		  AUTH_TOKEN = token;
-		  Transfer tran;
+//		  Transfer tran;
 		  try {
-			 tran = restTemplate.exchange(BASE_URL + "transfer", HttpMethod.POST, makeJSONEntity(AUTH_TOKEN, transferBody), Transfer.class).getBody();
+			 restTemplate.exchange(BASE_URL + "transfer", HttpMethod.POST, makeJSONEntity(AUTH_TOKEN, transferBody), Transfer.class).getBody();
 		  } catch (RestClientResponseException ex) {
 	            throw new AuthenticationServiceException(ex.getRawStatusCode() + " : " + ex.getResponseBodyAsString());
 	        }
-		  return tran;
+//		  return tran;
 	  }
 	  
 

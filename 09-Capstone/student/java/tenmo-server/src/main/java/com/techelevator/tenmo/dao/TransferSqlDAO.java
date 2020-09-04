@@ -176,17 +176,13 @@ public void viewTransfers() {
 
 	@Override
 	public Transfer transfer(Transfer transfer) {
-		double balance = 0;
+		Double balance = 0.0;
 		String sqlBalance = "SELECT balance FROM accounts WHERE account_id = ?;";
 		SqlRowSet rs = jdbcTemplate.queryForRowSet(sqlBalance, transfer.getAccount_from());
 		while(rs.next()) {
 			balance = rs.getDouble("balance");
 		}
-		double transferAmount = transfer.getAmount();
-//		BigDecimal compare = null;
-//		if (rs.next()) {
-//			compare = new BigDecimal(rs.getString("balance"));
-//		}
+		Double transferAmount = transfer.getAmount();
 		if (transferAmount < balance ) {
 			String sql = "INSERT INTO transfers (transfer_type_id, transfer_status_id, account_from, account_to, amount)" +
 					"VALUES (2,1,?,?,?) RETURNING transfer_id";
@@ -210,33 +206,33 @@ public void viewTransfers() {
 		boolean itWorked = true;
 		
 		int transferId = transfer.getTransfer_id();
-		double amount = transfer.getAmount();
+		Double amount = transfer.getAmount();
 		int accountFrom = transfer.getAccount_from();
 		int accountTo = transfer.getAccount_to();
 		
 		try {
 		// update balance for accountTo
-		double orgBalance = 0;
+		Double orgBalance = 0.0;
 		String sql = "SELECT balance FROM accounts WHERE account_id = ?";
 		SqlRowSet row = jdbcTemplate.queryForRowSet(sql, accountTo);
 		while(row.next()){
 			orgBalance = row.getDouble("balance");
 		}
 		
-		double newAmt = orgBalance + amount;
+		Double newAmt = orgBalance + amount;
 		
 		String sql1 = "UPDATE accounts SET balance = ?";
 		SqlRowSet row1 = jdbcTemplate.queryForRowSet(sql1, newAmt);
 		
 		// update balance for accountFrom
 		
-		double orgBalance1 = 0;
+		Double orgBalance1 = 0.0;
 		String sql2 = "SELECT balance FROM accounts WHERE account_id = ?";
 		SqlRowSet row2 = jdbcTemplate.queryForRowSet(sql2, accountFrom);
 		while(row2.next()) {
 			orgBalance1 = row.getDouble("balance");
 		}
-		double newAmt1 = orgBalance1 - amount;
+		Double newAmt1 = orgBalance1 - amount;
 		
 		String sql3 = "UPDATE accounts SET balance = ?";
 		SqlRowSet row3 = jdbcTemplate.queryForRowSet(sql3, newAmt1);
@@ -245,7 +241,7 @@ public void viewTransfers() {
 		String  sql4 = "UPDATE transfers SET transfer_status_id = 2 WHERE transfer_id = ?";
 		SqlRowSet row4 = jdbcTemplate.queryForRowSet(sql4, transferId);
 		
-		}catch (Exception e) {
+		} catch (Exception e) {
 			itWorked = false;
 		}
 		return itWorked;
@@ -257,7 +253,7 @@ public void viewTransfers() {
 		int transferStatusId = (rs.getInt("transfer_status_id"));
 		int accountFrom = (rs.getInt("account_from"));
 		int accountTo = (rs.getInt("account_to"));
-		int amount = (rs.getInt("amount"));
+		Double amount = (rs.getDouble("amount"));
 		Transfer transfer = new Transfer(transferId, transferTypeId,transferStatusId,accountFrom,accountTo,amount);
 		return transfer;
 	}
@@ -271,7 +267,7 @@ public void viewTransfers() {
 		long transferId = 0;
 		try {
 			long accountIdTo = 0;
-			double amount = 0.0;
+			Double amount = 0.0;
 			long userId = user.getId();
 			String sql = "SELECT transfer_id, account_to, amount FROM transfers WHERE account_from = ? AND transfer_status_id = 1";
 			SqlRowSet row = jdbcTemplate.queryForRowSet(sql, userId);
