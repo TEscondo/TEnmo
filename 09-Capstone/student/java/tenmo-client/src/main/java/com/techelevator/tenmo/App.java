@@ -131,12 +131,11 @@ private static final String API_BASE_URL = "http://localhost:8080/";
 		showUsers();
 		int fromUserId = console.getUserInputInteger("Enter ID of user you are requesting from (0 to cancel)");
 		if (fromUserId != 0) {
-			int amount = console.getUserInputInteger("Enter amount");
-			BigDecimal amountBigDec = new BigDecimal(amount);
+			Double amount = console.getUserInputDouble("Enter amount");
 			Integer toUserId = currentUser.getUser().getId();
-//			Transfer transferProcess = new Transfer(fromUserId, toUserId, amountBigDec);
+			Transfer transferProcess = new Transfer(fromUserId, toUserId, amount);
 			//TODO: Revisit
-//			authenticationService.newTransfer(currentUser.getToken(), transferProcess);
+			authenticationService.newTransfer(currentUser.getToken(), transferProcess);
 			System.out.println(amount + " TE Bucks were requested from user " + fromUserId);
 		} else {
 			System.out.println("Cancelling transfer...");
