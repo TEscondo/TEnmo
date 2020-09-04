@@ -120,7 +120,6 @@ public class AuthenticationService {
 	            throw new AuthenticationServiceException(ex.getRawStatusCode() + " : " + ex.getResponseBodyAsString());
 	        }
 	  }
-	  
 
 	  public TransferBack[] viewTransfers(String token, int userId) throws AuthenticationServiceException {
 		  TransferBack[] transfers = null;
@@ -133,10 +132,32 @@ public class AuthenticationService {
 		  return transfers;
 	  }
 	  
-	  public void viewPending(String token) throws AuthenticationServiceException {
+	  public Transfer viewTransferDetails(String token, int userId) throws AuthenticationServiceException {
+		Transfer transfer = null;
+		AUTH_TOKEN = token;
+		 try {
+			  transfer = restTemplate.exchange(BASE_URL + "transfers/" + userId + "/viewDetails", HttpMethod.GET, makeAuthEntity(), Transfer.class).getBody();
+		  } catch (RestClientResponseException ex) {
+	            throw new AuthenticationServiceException(ex.getRawStatusCode() + " : " + ex.getResponseBodyAsString());
+	        }
+		  return transfer;
+	  }
+	  
+	  public TransferBack[] viewPending(String token, int userId) throws AuthenticationServiceException {
+		  TransferBack[] pending = null;
 		  AUTH_TOKEN = token;
 		  try {
-			  restTemplate.exchange(BASE_URL + "transfers/pending", HttpMethod.GET, makeAuthEntity(), Transfer.class).getBody();
+			  pending = restTemplate.exchange(BASE_URL + "transfers/" + userId + "/pending", HttpMethod.GET, makeAuthEntity(), TransferBack[].class).getBody();
+		  } catch (RestClientResponseException ex) {
+	            throw new AuthenticationServiceException(ex.getRawStatusCode() + " : " + ex.getResponseBodyAsString());
+	        }
+		  return pending;
+	  }
+	  
+	  public void updatePending(String token, int optionChoice, int userId, int transferId) throws AuthenticationServiceException {
+		  AUTH_TOKEN = token;
+		  try {
+			  restTemplate.exchange(BASE_URL+"transfers/" + userId + "/pending/" + optionChoice, HttpMethod.PUT, makeAuthEntity(), Transfer.class).getBody();
 		  } catch (RestClientResponseException ex) {
 	            throw new AuthenticationServiceException(ex.getRawStatusCode() + " : " + ex.getResponseBodyAsString());
 	        }

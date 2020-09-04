@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.techelevator.tenmo.dao.TransferDAO;
@@ -30,25 +31,28 @@ public class TransferController {
 		this.transferDAO = transferDAO;
 	}
 	
+	@RequestMapping(value="/transfers/{id}/viewDetails",method=RequestMethod.GET)
+    public Transfer viewTransferDetails(@PathVariable int id) {
+    	return transferDAO.viewTransferDetails(id);
+    }
+	
 	@RequestMapping(value="/transfers/{id}/viewAll",method=RequestMethod.GET)
     public List<TransferBack> viewTransfers(@PathVariable int id) {
     	return transferDAO.viewTransfers(id);
     }
 	
-	 @RequestMapping(value="/transfers/pending",method=RequestMethod.GET)
-	    public void viewPending() {
-		 	System.out.println("Okay, I'm in the ViewPending method inside TransferController.");
-		 	transferDAO.viewPending();
+	 @RequestMapping(value="/transfers/{id}/pending",method=RequestMethod.GET)
+	    public void viewPending(@PathVariable int id) {
+		 	transferDAO.viewPending(id);
 	    }
+	 
+	 @RequestMapping(value="transfers/{id}/pending/{option}", method=RequestMethod.GET)
+	 public void updatePending(@RequestParam int transferId, @PathVariable int id, @PathVariable int option) {
+		 transferDAO.updatePending(option, transferId);
+	 }
 	
 	 @RequestMapping(value="/transfer", method=RequestMethod.POST)
-	    public void newTransfer(@RequestBody Transfer transfer) {
-		 
-		 	
-		 	System.out.println("Here is the JSON I'm deserializing:");
-		 	System.out.println(transfer);
-		 
-		 
+	    public void newTransfer(@RequestBody Transfer transfer) {		 
 	    	transferDAO.transfer(transfer);
 	    	transferDAO.updateBalance(transfer);
 	    	transferDAO.updateBalance1(transfer);
