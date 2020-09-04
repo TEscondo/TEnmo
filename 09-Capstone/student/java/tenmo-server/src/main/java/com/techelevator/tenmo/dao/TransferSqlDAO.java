@@ -106,19 +106,27 @@ public void viewTransfers() {
 		System.out.println("ID          From/To                 Amount");
 		System.out.println("-------------------------------------------");
 
+		System.out.println("here");
+		
 		// GET TRANSFERS FROM YOUR ACCOUNT TO ANOTHER ACCOUNT
-		try {
-			int accountId = 0;
-			long userId = user.getId();
+		int accountId = 0;
+		Long userId = user.getId();
+		int transferId = 0;
+		double amount = 0.0;
+		int accountIdToUser = 0;
+		int userIdToUser = 0;
+		String usernameToUser = "";
+		int accountIdFromUser = 0;
+		int userIdFromUser = 0;
+		String usernameFromUser = "";
+		
+		try {	
+		
 			String sqlForAccountId = "SELECT account_id FROM accounts WHERE user_id = ?";
 			SqlRowSet rowsetForAccountId = jdbcTemplate.queryForRowSet(sqlForAccountId, userId);
 			while (rowsetForAccountId.next()) {
 				accountId = rowsetForAccountId.getInt("account_id");
 			}
-
-			int transferId = 0;
-			double amount = 0.0;
-			int accountIdToUser = 0;
 			String sql = "SELECT transfer_id, account_to, amount FROM transfers WHERE account_from = ?";
 			SqlRowSet row = jdbcTemplate.queryForRowSet(sql, accountId);
 			while (row.next()) {
@@ -127,14 +135,12 @@ public void viewTransfers() {
 				accountIdToUser = row.getInt("account_to");
 			}
 
-			int userIdToUser = 0;
 			String sql1 = "SELECT user_id FROM accounts WHERE account_id = ?";
 			SqlRowSet rowset = jdbcTemplate.queryForRowSet(sql1, accountIdToUser);
 			while (rowset.next()) {
 				userIdToUser = rowset.getInt("user_id");
 			}
 
-			String usernameToUser = "";
 			String sql2 = "SELECT username FROM users WHERE user_id = ?";
 			SqlRowSet rowset1 = jdbcTemplate.queryForRowSet(sql2, userIdToUser);
 			while (rowset1.next()) {
@@ -144,7 +150,6 @@ public void viewTransfers() {
 			System.out.println(transferId + "          To: " + usernameToUser + "          $ " + amount);
 
 			// GET TRANSFERS TO YOUR ACCOUNT FROM ANOTHER ACCOUNT
-			int accountIdFromUser = 0;
 			String sql3 = "SELECT transfer_id, account_from, amount FROM transfers WHERE account_to = ?";
 			SqlRowSet row3 = jdbcTemplate.queryForRowSet(sql3, accountId);
 			while (row3.next()) {
@@ -152,15 +157,13 @@ public void viewTransfers() {
 				amount = row.getDouble("amount");
 				accountIdFromUser = row.getInt("account_from");
 			}
-
-			int userIdFromUser = 0;
+			
 			String sql4 = "SELECT user_id FROM accounts WHERE account_id = ?";
 			SqlRowSet row4 = jdbcTemplate.queryForRowSet(sql4, accountIdFromUser);
 			while (row4.next()) {
 				userIdFromUser = row4.getInt("user_id");
 			}
-
-			String usernameFromUser = "";
+			
 			String sql5 = "SELECT username FROM users WHERE user_id = ?";
 			SqlRowSet row5 = jdbcTemplate.queryForRowSet(sql5, userIdFromUser);
 			while (row5.next()) {
@@ -168,9 +171,11 @@ public void viewTransfers() {
 			}
 
 			System.out.println(transferId + "          From: " + usernameFromUser + "          $ " + amount);
+
 		} catch (NullPointerException e) {
-			System.out.println("No transfers to view.");
+			System.out.println("Hey we caught the error here!");
 		}
+			
 	}
 
 
@@ -221,11 +226,10 @@ public void viewTransfers() {
 		
 		Double newAmt = orgBalance + amount;
 		
-		String sql1 = "UPDATE accounts SET balance = ?";
-		SqlRowSet row1 = jdbcTemplate.queryForRowSet(sql1, newAmt);
+		String sql1 = "UPDATE accounts SET balance = ? WHERE account_id = ?";
+		SqlRowSet row1 = jdbcTemplate.queryForRowSet(sql1, newAmt, accountTo);
 		
 		// update balance for accountFrom
-		
 		Double orgBalance1 = 0.0;
 		String sql2 = "SELECT balance FROM accounts WHERE account_id = ?";
 		SqlRowSet row2 = jdbcTemplate.queryForRowSet(sql2, accountFrom);
@@ -234,8 +238,8 @@ public void viewTransfers() {
 		}
 		Double newAmt1 = orgBalance1 - amount;
 		
-		String sql3 = "UPDATE accounts SET balance = ?";
-		SqlRowSet row3 = jdbcTemplate.queryForRowSet(sql3, newAmt1);
+		String sql3 = "UPDATE accounts SET balance = ? WHERE account_id = ?";
+		SqlRowSet row3 = jdbcTemplate.queryForRowSet(sql3, newAmt1, accountFrom);
 		
 		// update transfer status
 		String  sql4 = "UPDATE transfers SET transfer_status_id = 2 WHERE transfer_id = ?";

@@ -126,7 +126,7 @@ public class AuthenticationService {
 	  public void viewTransfers(String token) throws AuthenticationServiceException {
 		  AUTH_TOKEN = token;
 		  try {
-			  restTemplate.exchange(BASE_URL + "transfers", HttpMethod.GET, makeAuthEntity(), Transfer.class).getBody();
+			  restTemplate.exchange(BASE_URL + "transfers/viewAll", HttpMethod.GET, makeAuthEntity(), Transfer.class).getBody();
 		  } catch (RestClientResponseException ex) {
 	            throw new AuthenticationServiceException(ex.getRawStatusCode() + " : " + ex.getResponseBodyAsString());
 	        }

@@ -21,19 +21,21 @@ public class TransferController {
 	private UserDAO userDAO;
 	private Transfer transfer;
 
-//	@Autowired
-//	public TransferController(TransferDAO transferDAO) {
-//		this.transferDAO = transferDAO;
-//	}
+	@Autowired
+	public TransferController(TransferDAO transferDAO) {
+		this.transferDAO = transferDAO;
+	}
 	
-	@RequestMapping(value="/transfers",method=RequestMethod.GET)
+	@RequestMapping(value="/transfers/viewAll",method=RequestMethod.GET)
     public void viewTransfers() {
+		System.out.println("Okay, I'm in the ViewTransfers method inside TransferController.");
     	transferDAO.viewTransfers();
     }
 	
 	 @RequestMapping(value="/transfers/pending",method=RequestMethod.GET)
 	    public void viewPending() {
-	    	transferDAO.viewPending();
+		 	System.out.println("Okay, I'm in the ViewPending method inside TransferController.");
+		 	transferDAO.viewPending();
 	    }
 	
 	 @RequestMapping(value="/transfer", method=RequestMethod.POST)
@@ -44,10 +46,8 @@ public class TransferController {
 		 	System.out.println(transfer);
 		 
 		 
-//	    	Transfer pending = null;
 	    	transferDAO.transfer(transfer);
 	    	transferDAO.updateBalance(transfer);
-//	    	return pending;
 	    }
 	 
 	  @RequestMapping(value="/transfer", method=RequestMethod.PUT)
