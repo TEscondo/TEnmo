@@ -81,7 +81,7 @@ private static final String API_BASE_URL = "http://localhost:8080/";
 	}
 
 	private void viewCurrentBalance() throws AuthenticationServiceException {
-		double balance = authenticationService.getBalance(currentUser.getToken());
+		BigDecimal balance = authenticationService.getBalance(currentUser.getToken());
 		System.out.println("Your current account balance is $" + balance);
 	}
 

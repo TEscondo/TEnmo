@@ -14,7 +14,6 @@ import org.springframework.security.config.annotation.authentication.builders.Au
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -23,10 +22,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.techelevator.tenmo.dao.UserDAO;
-import com.techelevator.tenmo.dao.UserSqlDAO;
 import com.techelevator.tenmo.model.LoginDTO;
 import com.techelevator.tenmo.model.RegisterUserDTO;
-import com.techelevator.tenmo.model.Transfer;
 import com.techelevator.tenmo.model.User;
 import com.techelevator.tenmo.model.UserAlreadyExistsException;
 import com.techelevator.tenmo.security.jwt.JWTFilter;
@@ -49,33 +46,12 @@ public class AuthenticationController {
         this.userDAO = userDAO;
     }
     
-    @RequestMapping(value="/transfers",method=RequestMethod.GET)
-    public void viewTransfers() {
-    	userDAO.viewTransfers();
-    }
-    
-    @RequestMapping(value="/transfers/pending",method=RequestMethod.GET)
-    public void viewPending() {
-    	userDAO.viewPending();
-    }
     
     @RequestMapping(value="/balance",method=RequestMethod.GET)
     public double getBalance(Principal principal) {
     	return userDAO.getBalance(principal);
     }
     
-    @RequestMapping(value="/transfer", method=RequestMethod.POST)
-    public Transfer newTransfer(@RequestBody Transfer transfer) {
-    	Transfer pending = null;
-    	pending = userDAO.transfer(transfer);
-    	userDAO.updateBalance(pending);
-    	return pending;
-    }
-    
-    @RequestMapping(value="/transfer", method=RequestMethod.PUT)
-    public void makeTransfer(@RequestBody Transfer transfer) {
-    	userDAO.updateBalance(transfer);
-    }
     
     
     @PreAuthorize("permitAll")

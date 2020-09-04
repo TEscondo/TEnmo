@@ -1,7 +1,7 @@
 package com.techelevator.tenmo.services;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.Map;
 
 import org.springframework.http.HttpEntity;
@@ -86,11 +86,11 @@ public class AuthenticationService {
 		return message;
 	}
 	
-	  public double getBalance(String token) throws AuthenticationServiceException {
+	  public BigDecimal getBalance(String token) throws AuthenticationServiceException {
 		  AUTH_TOKEN = token;
-		  double balance = 0.0;
+		  BigDecimal balance = null;
 			try {
-				balance = restTemplate.exchange(BASE_URL + "balance", HttpMethod.GET, makeAuthEntity(), double.class).getBody();
+				balance = restTemplate.exchange(BASE_URL + "balance", HttpMethod.GET, makeAuthEntity(), BigDecimal.class).getBody();
 			} catch (RestClientResponseException ex) {
 	            throw new AuthenticationServiceException(ex.getRawStatusCode() + " : " + ex.getResponseBodyAsString());
 	        }
@@ -115,7 +115,7 @@ public class AuthenticationService {
 		  AUTH_TOKEN = token;
 		  Transfer tran;
 		  try {
-			 tran = restTemplate.exchange(BASE_URL + "transfer", HttpMethod.POST, makeJSONEntity(AUTH_TOKEN), Transfer.class).getBody();
+			 tran = restTemplate.exchange(BASE_URL + "account/transfer", HttpMethod.POST, makeJSONEntity(AUTH_TOKEN), Transfer.class).getBody();
 		  } catch (RestClientResponseException ex) {
 	            throw new AuthenticationServiceException(ex.getRawStatusCode() + " : " + ex.getResponseBodyAsString());
 	        }
