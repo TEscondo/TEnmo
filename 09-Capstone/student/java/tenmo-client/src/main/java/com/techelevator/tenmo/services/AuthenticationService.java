@@ -14,6 +14,7 @@ import org.springframework.web.client.RestTemplate;
 
 import com.techelevator.tenmo.models.AuthenticatedUser;
 import com.techelevator.tenmo.models.Transfer;
+import com.techelevator.tenmo.models.TransferBack;
 import com.techelevator.tenmo.models.User;
 import com.techelevator.tenmo.models.UserCredentials;
 
@@ -113,24 +114,23 @@ public class AuthenticationService {
 	  
 	  public void newTransfer(String token, Transfer transferBody) throws AuthenticationServiceException {
 		  AUTH_TOKEN = token;
-//		  Transfer tran;
 		  try {
 			 restTemplate.exchange(BASE_URL + "transfer", HttpMethod.POST, makeJSONEntity(AUTH_TOKEN, transferBody), Transfer.class).getBody();
 		  } catch (RestClientResponseException ex) {
 	            throw new AuthenticationServiceException(ex.getRawStatusCode() + " : " + ex.getResponseBodyAsString());
 	        }
-//		  return tran;
 	  }
 	  
 
-	  public void viewTransfers(String token) throws AuthenticationServiceException {
+	  public TransferBack[] viewTransfers(String token, int userId) throws AuthenticationServiceException {
+		  TransferBack[] transfers = null;
 		  AUTH_TOKEN = token;
 		  try {
-			  restTemplate.exchange(BASE_URL + "transfers/viewAll", HttpMethod.GET, makeAuthEntity(), Transfer.class).getBody();
+			  transfers = restTemplate.exchange(BASE_URL + "transfers/" + userId + "/viewAll", HttpMethod.GET, makeAuthEntity(), TransferBack[].class).getBody();
 		  } catch (RestClientResponseException ex) {
 	            throw new AuthenticationServiceException(ex.getRawStatusCode() + " : " + ex.getResponseBodyAsString());
 	        }
-	  
+		  return transfers;
 	  }
 	  
 	  public void viewPending(String token) throws AuthenticationServiceException {

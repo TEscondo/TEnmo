@@ -18,6 +18,13 @@ public class Transfer {
 	private double amount;
 	private int account_to;
 	private int account_from;
+	private String username;
+	
+//	public Transfer(int transfer_id, String username, double amount) {
+//		this.amount = amount;
+//		this.transfer_id = transfer_id;
+//		this.username = username;
+//	}
 	
 	public Transfer(int transfer_id, int transfer_type_id, int transfer_status_id, int account_from, int account_to, double amount) {
 		this.amount = amount;

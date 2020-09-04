@@ -11,6 +11,7 @@ import org.springframework.web.client.RestTemplate;
 
 import com.techelevator.tenmo.models.AuthenticatedUser;
 import com.techelevator.tenmo.models.Transfer;
+import com.techelevator.tenmo.models.TransferBack;
 import com.techelevator.tenmo.models.User;
 import com.techelevator.tenmo.models.UserCredentials;
 import com.techelevator.tenmo.services.AuthenticationService;
@@ -86,14 +87,21 @@ private static final String API_BASE_URL = "http://localhost:8080/";
 	}
 
 	private void viewTransferHistory() throws AuthenticationServiceException {
-		authenticationService.viewTransfers(currentUser.getToken());
-		System.out.println("---------");
-		System.out.println("Please enter transfer ID to view details (0 to cancel): ");
+		TransferBack[] transfers = authenticationService.viewTransfers(currentUser.getToken(), currentUser.getUser().getId());
+	
+		System.out.println("-------------------------------------------");
+		System.out.println("Transfers");
+		System.out.println("ID          From		To           Amount");
+		System.out.println("-------------------------------------------");
+		try {
+		for (TransferBack transfer : transfers) {
+			System.out.println(transfer.getTransferId()+ "          " + transfer.getUsernameFrom() + "		" + transfer.getUsernameTo() + "		" + transfer.getAmount());
+		}
+		}catch (NullPointerException e) {
+			System.out.println("No previous transfers to view.");
+		}
 		
-		Scanner scanner = new Scanner(System.in);
-		int transferId = Integer.parseInt(scanner.nextLine());
-		scanner.close();
-		
+		Integer transferId = console.getUserInputInteger("Please enter transfer ID to view details (0 to cancel)");
 		if(transferId == 0) {
 			System.exit(0);
 		}
@@ -115,7 +123,7 @@ private static final String API_BASE_URL = "http://localhost:8080/";
 		} else {
 			System.out.println("Cancelling transfer...");
 		}
-	
+
 		
 	}
 

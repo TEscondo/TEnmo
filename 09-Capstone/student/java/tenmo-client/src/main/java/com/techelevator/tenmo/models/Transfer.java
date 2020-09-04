@@ -11,7 +11,7 @@ public class Transfer {
 	private Double amount;
 	private int account_to;
 	private int account_from;
-
+	
 	
 	
 	public Transfer(int transfer_id, int transfer_type_id, int transfer_status_id, Double amount, int account_to,
