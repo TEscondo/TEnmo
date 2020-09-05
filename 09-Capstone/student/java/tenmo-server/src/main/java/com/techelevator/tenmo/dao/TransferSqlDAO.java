@@ -68,14 +68,19 @@ public class TransferSqlDAO implements TransferDAO {
 		Long accountIdFromUser = null;
 		String usernameToUser = "";
 		String usernameFromUser = "";
+		int transferType = 0;
+		int transferStatus = 0;
+		
 
-		String sql = "SELECT transfer_id, account_to, account_from, amount FROM transfers WHERE account_from = ? OR account_to = ?";
+		String sql = "SELECT * FROM transfers WHERE account_from = ? OR account_to = ?";
 		SqlRowSet row = jdbcTemplate.queryForRowSet(sql, id, id);
 		while (row.next()) {
 			transferId = row.getInt("transfer_id");
 			amount = row.getDouble("amount");
 			accountIdToUser = row.getLong("account_to");
 			accountIdFromUser = row.getLong("account_from");
+			transferType = row.getInt("transfer_type_id");
+			transferStatus = row.getInt("transfer_status_id");
 
 			String sql2 = "SELECT username FROM users WHERE user_id = ?";
 			SqlRowSet rowset1 = jdbcTemplate.queryForRowSet(sql2, accountIdToUser);
@@ -89,7 +94,7 @@ public class TransferSqlDAO implements TransferDAO {
 				usernameFromUser = rowset2.getString("username");
 			}
 
-			TransferBack transfer = new TransferBack(transferId, usernameToUser, usernameFromUser, amount);
+			TransferBack transfer = new TransferBack(transferId, usernameToUser, usernameFromUser, amount, transferType, transferStatus);
 			transferList.add(transfer);
 		}
 
@@ -196,6 +201,8 @@ public class TransferSqlDAO implements TransferDAO {
 		Long accountIdFromUser = null;
 		String usernameToUser = "";
 		String usernameFromUser = "";
+		int transferType = 0;
+		int transferStatus = 0;
 
 		String sql = "SELECT transfer_id, account_to, account_from, amount FROM transfers WHERE account_from = ? OR account_to = ? AND transfer_status_id = 1";
 		SqlRowSet row = jdbcTemplate.queryForRowSet(sql, id, id);

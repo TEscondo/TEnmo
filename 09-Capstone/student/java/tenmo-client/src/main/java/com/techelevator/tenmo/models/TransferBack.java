@@ -5,6 +5,8 @@ public class TransferBack {
 	private String usernameTo;
 	private String usernameFrom;
 	private Double amount;
+	int transferTypeId;
+	int transferStatusId;
 	
 //	public TransferBack(int transferId, String usernameTo, String usernameFrom, Double amount) {
 //		this.transferId = transferId;
@@ -15,6 +17,22 @@ public class TransferBack {
 
 	public int getTransferId() {
 		return transferId;
+	}
+
+	public int getTransferTypeId() {
+		return transferTypeId;
+	}
+
+	public void setTransferTypeId(int transferTypeId) {
+		this.transferTypeId = transferTypeId;
+	}
+
+	public int getTransferStatusId() {
+		return transferStatusId;
+	}
+
+	public void setTransferStatusId(int transferStatusId) {
+		this.transferStatusId = transferStatusId;
 	}
 
 	public void setTransferId(int transferId) {

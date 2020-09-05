@@ -114,16 +114,32 @@ public class App {
 			Integer transferId = console.getUserInputInteger("Please enter transfer ID to view details (0 to cancel)");
 			for (int i = 0; i<transfers.length; i++) {
 				if (transferId != 0 && transferId == transfers[i].getTransferId()) {
-					Transfer transfer = authenticationService.viewTransferDetails(currentUser.getToken(),
-							currentUser.getUser().getId());
+					String transferType = "";
+					String transferStatus = "";
+					if (transfers[i].getTransferTypeId() == 1) {
+						transferType = "Request";
+					}
+					else if (transfers[i].getTransferTypeId() == 2) {
+						transferType = "Send";
+					}
+					if (transfers[i].getTransferStatusId() == 1) {
+						transferStatus = "Pending";
+					}
+					else if (transfers[i].getTransferStatusId() == 2) {
+						transferStatus = "Approved";
+					}
+					else if (transfers[i].getTransferStatusId() == 3) {
+						transferStatus = "Rejected";
+					}
+					
 					System.out.println("-------------------------------------------");
 					System.out.println("Transfer Details");
 					System.out.println("-------------------------------------------");
 					System.out.println("Id: " + transferId);
 					System.out.println("From: " + transfers[i].getUsernameFrom());
 					System.out.println("To: " + transfers[i].getUsernameTo());
-					System.out.println("Type: " + transfers[i].getTransferId());//THIS NEEDS TO BE FIXED
-					System.out.println("Status: " + transfers[i].getTransferId());// THIS NEEDS TO BE FIXED
+					System.out.println("Type: " + transferType);//THIS NEEDS TO BE FIXED
+					System.out.println("Status: " + transferStatus);// THIS NEEDS TO BE FIXED
 					System.out.println("Amount: $" + transfers[i].getAmount());
 				
 			}

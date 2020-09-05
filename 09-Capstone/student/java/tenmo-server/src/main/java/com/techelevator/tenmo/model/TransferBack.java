@@ -6,6 +6,19 @@ public class TransferBack {
 	String usernameTo;
 	String usernameFrom;
 	Double amount;
+	int transferTypeId;
+	int transferStatusId;
+	
+	
+	public TransferBack(int transferId, String usernameTo, String usernameFrom, Double amount, int transferTypeId, int transferStatusId) {
+		super();
+		this.transferId = transferId;
+		this.usernameTo = usernameTo;
+		this.usernameFrom = usernameFrom;
+		this.amount = amount;
+		this.transferTypeId = transferTypeId;
+		this.transferStatusId = transferStatusId; 
+	}
 	
 	public TransferBack(int transferId, String usernameTo, String usernameFrom, Double amount) {
 		super();
@@ -14,6 +27,27 @@ public class TransferBack {
 		this.usernameFrom = usernameFrom;
 		this.amount = amount;
 	}
+	
+	public int getTransferTypeId() {
+		return transferTypeId;
+	}
+
+
+	public void setTransferTypeId(int transferTypeId) {
+		this.transferTypeId = transferTypeId;
+	}
+
+
+	public int getTransferStatusId() {
+		return transferStatusId;
+	}
+
+
+	public void setTransferStatusId(int transferStatusId) {
+		this.transferStatusId = transferStatusId;
+	}
+
+
 
 	public int getTransferId() {
 		return transferId;
