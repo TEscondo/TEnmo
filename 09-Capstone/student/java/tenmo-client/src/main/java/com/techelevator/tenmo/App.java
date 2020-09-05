@@ -85,7 +85,7 @@ public class App {
 	}
 
 	private void viewCurrentBalance() throws AuthenticationServiceException {
-		BigDecimal balance = authenticationService.getBalance(currentUser.getToken());
+		double balance = authenticationService.getBalance(currentUser.getToken());
 		System.out.println("Your current account balance is $" + balance);
 	}
 
@@ -138,8 +138,8 @@ public class App {
 					System.out.println("Id: " + transferId);
 					System.out.println("From: " + transfers[i].getUsernameFrom());
 					System.out.println("To: " + transfers[i].getUsernameTo());
-					System.out.println("Type: " + transferType);//THIS NEEDS TO BE FIXED
-					System.out.println("Status: " + transferStatus);// THIS NEEDS TO BE FIXED
+					System.out.println("Type: " + transferType);
+					System.out.println("Status: " + transferStatus);
 					System.out.println("Amount: $" + transfers[i].getAmount());
 				
 			}
@@ -189,9 +189,10 @@ public class App {
 
 	private void sendBucks() throws Exception {
 		showUsers();
+		double balance = authenticationService.getBalance(currentUser.getToken());
 		Integer toUserId = console.getUserInputInteger("Enter ID of user you are sending to (0 to cancel)");
-		if (toUserId != 0) {
-			Double amount = console.getUserInputDouble("Enter amount");
+		Double amount = console.getUserInputDouble("Enter amount");
+		if (toUserId != 0 && amount < balance) {
 			Integer fromUserId = currentUser.getUser().getId();
 			int transferTypeId = 2;
 			int transferStatusId = 2;
@@ -203,7 +204,11 @@ public class App {
 			transferProcess.setTransfer_type_id(transferTypeId);
 			authenticationService.newTransfer(currentUser.getToken(), transferProcess);
 			System.out.println(amount + " TE Bucks were sent to user " + toUserId);
-		} else {
+		} 
+		else if (amount > balance) {
+			System.out.println("Insufficient funds...");
+		}
+		else {
 			System.out.println("Cancelling transfer...");
 		}
 

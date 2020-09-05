@@ -87,11 +87,11 @@ public class AuthenticationService {
 		return message;
 	}
 	
-	  public BigDecimal getBalance(String token) throws AuthenticationServiceException {
+	  public double getBalance(String token) throws AuthenticationServiceException {
 		  AUTH_TOKEN = token;
-		  BigDecimal balance = null;
+		  double balance = 0.00;
 			try {
-				balance = restTemplate.exchange(BASE_URL + "balance", HttpMethod.GET, makeAuthEntity(), BigDecimal.class).getBody();
+				balance = restTemplate.exchange(BASE_URL + "balance", HttpMethod.GET, makeAuthEntity(), double.class).getBody();
 			} catch (RestClientResponseException ex) {
 	            throw new AuthenticationServiceException(ex.getRawStatusCode() + " : " + ex.getResponseBodyAsString());
 	        }
