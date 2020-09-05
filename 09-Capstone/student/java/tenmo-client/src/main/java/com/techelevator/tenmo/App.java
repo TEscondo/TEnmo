@@ -105,23 +105,30 @@ public class App {
 		} catch (NullPointerException e) {
 			System.out.println("No previous transfers to view.");
 		}
+			viewTransferDetails();
 
-		Integer transferId = console.getUserInputInteger("Please enter transfer ID to view details (0 to cancel)");
-		if (transferId == 0) {
-			System.exit(0);
-		}
-
-		Transfer transfer = authenticationService.viewTransferDetails(currentUser.getToken(),
-				currentUser.getUser().getId());
-		System.out.println("-------------------------------------------");
-		System.out.println("Transfer Details");
-		System.out.println("-------------------------------------------");
-		System.out.println("Id: " + transferId);
-		System.out.println("From: " + transfer.getAccount_from());
-		System.out.println("To: " + transfer.getAccount_to());
-		System.out.println("Type: " + transfer.getTransfer_type_id());
-		System.out.println("Status: " + transfer.getTransfer_status_id());
-		System.out.println("Amount: $" + transfer.getAmount());
+	}
+		private void viewTransferDetails() throws AuthenticationServiceException {
+			TransferBack[] transfers = authenticationService.viewTransfers(currentUser.getToken(),
+					currentUser.getUser().getId());
+			Integer transferId = console.getUserInputInteger("Please enter transfer ID to view details (0 to cancel)");
+			for (int i = 0; i<transfers.length; i++) {
+				if (transferId != 0 && transferId == transfers[i].getTransferId()) {
+					Transfer transfer = authenticationService.viewTransferDetails(currentUser.getToken(),
+							currentUser.getUser().getId());
+					System.out.println("-------------------------------------------");
+					System.out.println("Transfer Details");
+					System.out.println("-------------------------------------------");
+					System.out.println("Id: " + transferId);
+					System.out.println("From: " + transfers[i].getUsernameFrom());
+					System.out.println("To: " + transfers[i].getUsernameTo());
+					System.out.println("Type: " + transfers[i].getTransferId());//THIS NEEDS TO BE FIXED
+					System.out.println("Status: " + transfers[i].getTransferId());// THIS NEEDS TO BE FIXED
+					System.out.println("Amount: $" + transfers[i].getAmount());
+				
+			}
+				
+			}
 	}
 
 	private void viewPendingRequests() throws AuthenticationServiceException {
