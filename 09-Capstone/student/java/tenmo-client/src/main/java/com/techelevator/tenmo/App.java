@@ -163,28 +163,38 @@ public class App {
 			System.out.println("You have no pending transfers.");
 		}
 		System.out.println("---------");
+		if (pendingTransfers.length == 0) {
+			System.out.println("You have no pending transfers. Enter any number to cancel.");
+		}
 
 		Integer transferId = console.getUserInputInteger("Please enter transfer ID to approve/reject (0 to cancel)");
 		Integer choice = null;
-		if (transferId != 0) {
+		if (transferId != 0 && pendingTransfers.length > 0) {
 			System.out.println("1: Approve");
 			System.out.println("2: Reject");
 			System.out.println("0: Don't approve or reject");
 			System.out.println("---------");
 			choice = console.getUserInputInteger("Please choose an option");
-		} else {
-			System.exit(0);
-		}
-		if (choice != 0) {
+		if (choice == 1) {
 			try {
-				authenticationService.updatePending(currentUser.getToken(), choice, currentUser.getUser().getId(),
+				authenticationService.updatePendingApprove(currentUser.getToken(), currentUser.getUser().getId(),
 						transferId);
 			} catch (NullPointerException e) {
+				System.out.println("Something went wrong");
 			}
-		} else {
+			}
+		else if (choice ==2) {
+				try {
+					authenticationService.updatePendingReject(currentUser.getToken(), currentUser.getUser().getId(), transferId);
+				} catch (NullPointerException e) {
+					System.out.println("Something went wrong");
+				}
 			System.out.println("Cancelling...");
 		}
-
+		else if (choice == 0) {
+			;
+		}
+		}
 	}
 
 	private void sendBucks() throws Exception {
@@ -202,7 +212,7 @@ public class App {
 			transferProcess.setAmount(amount);
 			transferProcess.setTransfer_status_id(transferStatusId);
 			transferProcess.setTransfer_type_id(transferTypeId);
-			authenticationService.newTransfer(currentUser.getToken(), transferProcess);
+			authenticationService.transferSend(currentUser.getToken(), transferProcess);
 			System.out.println(amount + " TE Bucks were sent to user " + toUserId);
 		} 
 		else if (amount > balance) {
@@ -217,8 +227,8 @@ public class App {
 	private void requestBucks() throws Exception {
 		showUsers();
 		int fromUserId = console.getUserInputInteger("Enter ID of user you are requesting from (0 to cancel)");
+		double amount = console.getUserInputDouble("Enter amount");
 		if (fromUserId != 0) {
-			double amount = console.getUserInputDouble("Enter amount");
 			Integer toUserId = currentUser.getUser().getId();
 			int transferTypeId = 1;
 			int transferStatusId = 1;
@@ -228,7 +238,7 @@ public class App {
 			transferProcess.setAmount(amount);
 			transferProcess.setTransfer_status_id(transferStatusId);
 			transferProcess.setTransfer_type_id(transferTypeId);
-			authenticationService.newTransfer(currentUser.getToken(), transferProcess);
+			authenticationService.transferRequest(currentUser.getToken(), transferProcess);
 			System.out.println(amount + " TE Bucks were requested from user " + fromUserId);
 		} else {
 			System.out.println("Cancelling transfer...");

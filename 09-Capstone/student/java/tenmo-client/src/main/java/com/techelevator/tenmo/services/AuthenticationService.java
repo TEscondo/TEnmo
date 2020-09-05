@@ -1,6 +1,6 @@
 package com.techelevator.tenmo.services;
 
-import java.math.BigDecimal;
+
 import java.time.LocalDateTime;
 import java.util.Map;
 
@@ -112,10 +112,19 @@ public class AuthenticationService {
 				return entity;
 			}
 	  
-	  public void newTransfer(String token, Transfer transferBody) throws AuthenticationServiceException {
+	  public void transferSend(String token, Transfer transferBody) throws AuthenticationServiceException {
 		  AUTH_TOKEN = token;
 		  try {
-			 restTemplate.exchange(BASE_URL + "transfer", HttpMethod.POST, makeJSONEntity(AUTH_TOKEN, transferBody), Transfer.class).getBody();
+			 restTemplate.exchange(BASE_URL + "transfer/send", HttpMethod.POST, makeJSONEntity(AUTH_TOKEN, transferBody), Transfer.class).getBody();
+		  } catch (RestClientResponseException ex) {
+	            throw new AuthenticationServiceException(ex.getRawStatusCode() + " : " + ex.getResponseBodyAsString());
+	        }
+	  }
+	  
+	  public void transferRequest(String token, Transfer transferBody) throws AuthenticationServiceException {
+		  AUTH_TOKEN = token;
+		  try {
+			 restTemplate.exchange(BASE_URL + "transfer/request", HttpMethod.POST, makeJSONEntity(AUTH_TOKEN, transferBody), Transfer.class).getBody();
 		  } catch (RestClientResponseException ex) {
 	            throw new AuthenticationServiceException(ex.getRawStatusCode() + " : " + ex.getResponseBodyAsString());
 	        }
@@ -154,10 +163,19 @@ public class AuthenticationService {
 		  return pending;
 	  }
 	  
-	  public void updatePending(String token, int optionChoice, int userId, int transferId) throws AuthenticationServiceException {
+	  public void updatePendingApprove(String token, int userId, int transferId) throws AuthenticationServiceException {
 		  AUTH_TOKEN = token;
 		  try {
-			  restTemplate.exchange(BASE_URL+"transfers/" + userId + "/pending/" + optionChoice + "/" + transferId, HttpMethod.PUT, makeAuthEntity(), Transfer.class).getBody();
+			  restTemplate.exchange(BASE_URL+"transfers/" + userId + "/pending/2/" + transferId, HttpMethod.PUT, makeAuthEntity(), Transfer.class).getBody();
+		  } catch (RestClientResponseException ex) {
+	            throw new AuthenticationServiceException(ex.getRawStatusCode() + " : " + ex.getResponseBodyAsString());
+	        }
+	  }
+	  
+	  public void updatePendingReject(String token, int userId, int transferId) throws AuthenticationServiceException {
+		  AUTH_TOKEN = token;
+		  try {
+			  restTemplate.exchange(BASE_URL+"transfers/" + userId + "/pending/3/" + transferId, HttpMethod.PUT, makeAuthEntity(), Transfer.class).getBody();
 		  } catch (RestClientResponseException ex) {
 	            throw new AuthenticationServiceException(ex.getRawStatusCode() + " : " + ex.getResponseBodyAsString());
 	        }

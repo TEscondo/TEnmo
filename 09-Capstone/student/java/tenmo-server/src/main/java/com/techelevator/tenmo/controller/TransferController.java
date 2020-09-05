@@ -42,22 +42,32 @@ public class TransferController {
     }
 	
 	 @RequestMapping(value="/transfers/{id}/pending",method=RequestMethod.GET)
-	    public void viewPending(@PathVariable int id) {
-		 	transferDAO.viewPending(id);
+	    public List<TransferBack> viewPending(@PathVariable int id) {
+		 	return transferDAO.viewPending(id);
 	    }
 	 
-	 @RequestMapping(value="transfers/{id}/pending/{option}/{transferId}", method=RequestMethod.PUT)
-	 public void updatePending(@PathVariable int id, @PathVariable int option, @PathVariable int transferId) {
-		 transferDAO.updatePending(option, transferId);
+	 @RequestMapping(value="transfers/{id}/pending/2/{transferId}", method=RequestMethod.PUT)
+	 public void updatePendingApprove(@PathVariable int id, @PathVariable int transferId) {
+		 transferDAO.updatePendingApprove(transferId);
+	 }
+	 
+	 @RequestMapping(value="transfers/{id}/pending/3/{transferId}", method=RequestMethod.PUT)
+	 public void updatePendingReject(@PathVariable int id, @PathVariable int transferId) {
+		 transferDAO.updatePendingReject(transferId);
 	 }
 	
-	 @RequestMapping(value="/transfer", method=RequestMethod.POST)
-	    public void newTransfer(@RequestBody Transfer transfer) {		 
-	    	transferDAO.transfer(transfer);
+	 @RequestMapping(value="/transfer/send", method=RequestMethod.POST)
+	    public void transferSend(@RequestBody Transfer transfer) {		 
+	    	transferDAO.transferSend(transfer);
 	    	transferDAO.updateBalance(transfer);
 	    	transferDAO.updateBalance1(transfer);
 	    	transferDAO.updateBalance2(transfer);
 	    }
+	 
+	 @RequestMapping(value = "/transfer/request", method=RequestMethod.POST)
+	 public void transferRequest(@RequestBody Transfer transfer) {
+		 transferDAO.transferRequest(transfer);
+	 }
 	 
 	  @RequestMapping(value="/transfer", method=RequestMethod.PUT)
 	    public void makeTransfer(@RequestBody Transfer transfer) {

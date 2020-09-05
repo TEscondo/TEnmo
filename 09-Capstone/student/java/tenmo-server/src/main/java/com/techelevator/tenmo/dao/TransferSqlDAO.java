@@ -21,12 +21,11 @@ public class TransferSqlDAO implements TransferDAO {
 	}
 
 	@Override
-	public void updatePending(int optionChoice, int transferId) {
-			if (optionChoice == 1) {
+	public void updatePendingApprove(int transferId) {
 				String sql = "UPDATE transfers SET transfer_status_id = 2 WHERE transfer_id = ?";
 				jdbcTemplate.update(sql, transferId);
 				
-				String sql1 = "SELECT * FROM transfer WHERE transfer_id = ?";
+				String sql1 = "SELECT * FROM transfers WHERE transfer_id = ?";
 				SqlRowSet row1 = jdbcTemplate.queryForRowSet(sql1, transferId);
 				Transfer transfer = null;
 				while(row1.next()) {
@@ -35,13 +34,14 @@ public class TransferSqlDAO implements TransferDAO {
 				updateBalance(transfer);
 				updateBalance1(transfer);
 				updateBalance2(transfer);
-				System.out.println("The request has been approved.");
-			}
-			if (optionChoice == 2) {
-				String sql = "UPDATE transfers SET transfer_status_id = 3 WHERE transfer_id = ?";
-				jdbcTemplate.update(sql, transferId);
-				System.out.println("The request has been rejected.");
-			}
+				System.out.println("The request has been approved.");		
+	}
+	
+	@Override
+	public void updatePendingReject(int transferId) {
+			String sql = "UPDATE transfers SET transfer_status_id = 3 WHERE transfer_id = ?";
+			jdbcTemplate.update(sql, transferId);
+			System.out.println("The request has been rejected.");
 	}
 	
 	@Override
@@ -108,7 +108,7 @@ public class TransferSqlDAO implements TransferDAO {
 	}
 
 	@Override
-	public Transfer transfer(Transfer transfer) {
+	public Transfer transferSend(Transfer transfer) {
 		Double balance = 0.0;
 		String sqlBalance = "SELECT balance FROM accounts WHERE account_id = ?;";
 		SqlRowSet rs = jdbcTemplate.queryForRowSet(sqlBalance, transfer.getAccount_from());
@@ -127,6 +127,24 @@ public class TransferSqlDAO implements TransferDAO {
 			return transfer;
 		} else {
 			System.out.println("Insufficient funds");
+			return null;
+		}
+	}
+	
+	@Override
+	public Transfer transferRequest(Transfer transfer) {
+		Double transferAmount = transfer.getAmount();
+		if (transferAmount > 0) {
+			String sql = "INSERT INTO transfers (transfer_type_id, transfer_status_id, account_from, account_to, amount)"
+					+ "VALUES (1,1,?,?,?) RETURNING transfer_id";
+			SqlRowSet rs2 = jdbcTemplate.queryForRowSet(sql, transfer.getAccount_from(), transfer.getAccount_to(),
+					transfer.getAmount());
+			if (rs2.next()) {
+				transfer.setTransfer_id(rs2.getInt("transfer_id"));
+			}
+			return transfer;
+		} else {
+			System.out.println("Invalid amount");
 			return null;
 		}
 	}
@@ -188,7 +206,7 @@ public class TransferSqlDAO implements TransferDAO {
 		int transferId = transfer.getTransfer_id();
 
 		try {
-			// update transfer status
+			// update transfer status to approved
 			String sql4 = "UPDATE transfers SET transfer_status_id = 2 WHERE transfer_id = ?";
 			SqlRowSet row4 = jdbcTemplate.queryForRowSet(sql4, transferId);
 		} catch (Exception e) {
@@ -196,6 +214,22 @@ public class TransferSqlDAO implements TransferDAO {
 		}
 		return itWorked;
 	}
+	
+	@Override
+	public boolean updateBalance3(Transfer transfer) {
+		boolean itWorked = true;
+		int transferId = transfer.getTransfer_id();
+
+		try {
+			// update transfer status to rejected
+			String sql4 = "UPDATE transfers SET transfer_status_id = 3 WHERE transfer_id = ?";
+			SqlRowSet row4 = jdbcTemplate.queryForRowSet(sql4, transferId);
+		} catch (Exception e) {
+			itWorked = false;
+		}
+		return itWorked;
+	}
+	
 
 	private Transfer mapRowToTransfer(SqlRowSet rs) {
 		int transferId = (rs.getInt("transfer_id"));
@@ -223,10 +257,8 @@ public class TransferSqlDAO implements TransferDAO {
 		Long accountIdFromUser = null;
 		String usernameToUser = "";
 		String usernameFromUser = "";
-		int transferType = 0;
-		int transferStatus = 0;
 
-		String sql = "SELECT transfer_id, account_to, account_from, amount FROM transfers WHERE account_from = ? OR account_to = ? AND transfer_status_id = 1";
+		String sql = "SELECT * FROM transfers WHERE (account_from = ? AND transfer_status_id = 1) OR (account_to = ? AND transfer_status_id = 1)";
 		SqlRowSet row = jdbcTemplate.queryForRowSet(sql, id, id);
 		while (row.next()) {
 			transferId = row.getInt("transfer_id");
