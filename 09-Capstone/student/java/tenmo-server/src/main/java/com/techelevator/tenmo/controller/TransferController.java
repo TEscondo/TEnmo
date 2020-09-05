@@ -46,8 +46,8 @@ public class TransferController {
 		 	transferDAO.viewPending(id);
 	    }
 	 
-	 @RequestMapping(value="transfers/{id}/pending/{option}", method=RequestMethod.GET)
-	 public void updatePending(@RequestParam int transferId, @PathVariable int id, @PathVariable int option) {
+	 @RequestMapping(value="transfers/{id}/pending/{option}/{transferId}", method=RequestMethod.GET)
+	 public void updatePending(@PathVariable int id, @PathVariable int option, @PathVariable int transferId) {
 		 transferDAO.updatePending(option, transferId);
 	 }
 	

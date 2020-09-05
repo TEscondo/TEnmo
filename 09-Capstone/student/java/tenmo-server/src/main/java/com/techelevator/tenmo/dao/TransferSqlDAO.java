@@ -29,6 +29,15 @@ public class TransferSqlDAO implements TransferDAO {
 			if (optionChoice == 1) {
 				String sql = "UPDATE transfers SET transfer_status_id = 2 WHERE transfer_id = ?";
 				jdbcTemplate.update(sql, transferId);
+				
+				String sql1 = "SELECT * FROM transfer WHERE transfer_id = ?";
+				SqlRowSet row1 = jdbcTemplate.queryForRowSet(sql1, transferId);
+				Transfer transfer = null;
+				while(row1.next()) {
+					transfer = mapRowToTransfer(row1);
+				}
+				updateBalance(transfer);
+				updateBalance1(transfer);
 				System.out.println("The request has been approved.");
 			}
 			if (optionChoice == 2) {
@@ -37,7 +46,7 @@ public class TransferSqlDAO implements TransferDAO {
 				System.out.println("The request has been rejected.");
 			}
 	}
-
+	
 	@Override
 	public Transfer viewTransferDetails(int transferId) {
 		Transfer transfer = null;

@@ -157,7 +157,7 @@ public class AuthenticationService {
 	  public void updatePending(String token, int optionChoice, int userId, int transferId) throws AuthenticationServiceException {
 		  AUTH_TOKEN = token;
 		  try {
-			  restTemplate.exchange(BASE_URL+"transfers/" + userId + "/pending/" + optionChoice, HttpMethod.PUT, makeAuthEntity(), Transfer.class).getBody();
+			  restTemplate.exchange(BASE_URL+"transfers/" + userId + "/pending/" + optionChoice + "/" + transferId, HttpMethod.PUT, makeAuthEntity(), Transfer.class).getBody();
 		  } catch (RestClientResponseException ex) {
 	            throw new AuthenticationServiceException(ex.getRawStatusCode() + " : " + ex.getResponseBodyAsString());
 	        }

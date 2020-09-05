@@ -132,8 +132,9 @@ public class App {
 	}
 
 	private void viewPendingRequests() throws AuthenticationServiceException {
+		TransferBack[] pendingTransfers = null;
 		try {
-		TransferBack[] pendingTransfers = authenticationService.viewPending(currentUser.getToken(),
+		pendingTransfers = authenticationService.viewPending(currentUser.getToken(),
 				currentUser.getUser().getId());
 		System.out.println("-------------PENDING TRANSFERS-------------");
 		System.out.println("ID          To                     Amount");
@@ -155,6 +156,8 @@ public class App {
 			System.out.println("0: Don't approve or reject");
 			System.out.println("---------");
 			choice = console.getUserInputInteger("Please choose an option");
+		} else {
+			System.exit(0);
 		}
 		if (choice != 0) {
 			try {
@@ -174,7 +177,9 @@ public class App {
 		if (toUserId != 0) {
 			Double amount = console.getUserInputDouble("Enter amount");
 			Integer fromUserId = currentUser.getUser().getId();
-			Transfer transferProcess = new Transfer(fromUserId, toUserId, amount);
+			int transferTypeId = 2;
+			int transferStatusId = 2;
+			Transfer transferProcess = new Transfer(transferTypeId, transferStatusId, amount, fromUserId, toUserId);
 			authenticationService.newTransfer(currentUser.getToken(), transferProcess);
 			System.out.println(amount + " TE Bucks were sent to user " + toUserId);
 		} else {
@@ -187,17 +192,12 @@ public class App {
 		showUsers();
 		int fromUserId = console.getUserInputInteger("Enter ID of user you are requesting from (0 to cancel)");
 		if (fromUserId != 0) {
-			Double amount = console.getUserInputDouble("Enter amount");
+			double amount = console.getUserInputDouble("Enter amount");
 			Integer toUserId = currentUser.getUser().getId();
-
-			Transfer transferProcess = new Transfer(fromUserId, toUserId, amount);
-			//TODO: Revisit
+			int transferTypeId = 1;
+			int transferStatusId = 1;
+			Transfer transferProcess = new Transfer(transferTypeId, transferStatusId, amount, fromUserId, toUserId);
 			authenticationService.newTransfer(currentUser.getToken(), transferProcess);
-
-//			Transfer transferProcess = new Transfer(fromUserId, toUserId, amountBigDec);
-			// TODO: Revisit
-//			authenticationService.newTransfer(currentUser.getToken(), transferProcess);
-
 			System.out.println(amount + " TE Bucks were requested from user " + fromUserId);
 		} else {
 			System.out.println("Cancelling transfer...");
