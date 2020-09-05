@@ -202,7 +202,7 @@ public class App {
 		double balance = authenticationService.getBalance(currentUser.getToken());
 		Integer toUserId = console.getUserInputInteger("Enter ID of user you are sending to (0 to cancel)");
 		Double amount = console.getUserInputDouble("Enter amount");
-		if (toUserId != 0 && amount < balance) {
+		if (toUserId != 0 && amount < balance && toUserId != currentUser.getUser().getId()) {
 			Integer fromUserId = currentUser.getUser().getId();
 			int transferTypeId = 2;
 			int transferStatusId = 2;
@@ -228,7 +228,7 @@ public class App {
 		showUsers();
 		int fromUserId = console.getUserInputInteger("Enter ID of user you are requesting from (0 to cancel)");
 		double amount = console.getUserInputDouble("Enter amount");
-		if (fromUserId != 0) {
+		if (fromUserId != 0 && fromUserId != currentUser.getUser().getId()) {
 			Integer toUserId = currentUser.getUser().getId();
 			int transferTypeId = 1;
 			int transferStatusId = 1;
