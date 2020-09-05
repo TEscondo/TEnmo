@@ -46,7 +46,7 @@ public class TransferController {
 		 	transferDAO.viewPending(id);
 	    }
 	 
-	 @RequestMapping(value="transfers/{id}/pending/{option}/{transferId}", method=RequestMethod.GET)
+	 @RequestMapping(value="transfers/{id}/pending/{option}/{transferId}", method=RequestMethod.PUT)
 	 public void updatePending(@PathVariable int id, @PathVariable int option, @PathVariable int transferId) {
 		 transferDAO.updatePending(option, transferId);
 	 }
@@ -56,11 +56,14 @@ public class TransferController {
 	    	transferDAO.transfer(transfer);
 	    	transferDAO.updateBalance(transfer);
 	    	transferDAO.updateBalance1(transfer);
+	    	transferDAO.updateBalance2(transfer);
 	    }
 	 
 	  @RequestMapping(value="/transfer", method=RequestMethod.PUT)
 	    public void makeTransfer(@RequestBody Transfer transfer) {
 	    	transferDAO.updateBalance(transfer);
+	    	transferDAO.updateBalance1(transfer);
+	    	transferDAO.updateBalance2(transfer);
 	    }
 	
 	

@@ -19,4 +19,6 @@ public interface TransferDAO {
 	List<TransferBack> viewPending (int id);
 
 	boolean updateBalance1(Transfer transfer);
+	
+	boolean updateBalance2(Transfer transfer);
 }

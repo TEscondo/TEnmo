@@ -195,7 +195,12 @@ public class App {
 			Integer fromUserId = currentUser.getUser().getId();
 			int transferTypeId = 2;
 			int transferStatusId = 2;
-			Transfer transferProcess = new Transfer(transferTypeId, transferStatusId, amount, fromUserId, toUserId);
+			Transfer transferProcess = new Transfer();
+			transferProcess.setAccount_from(fromUserId);
+			transferProcess.setAccount_to(toUserId);
+			transferProcess.setAmount(amount);
+			transferProcess.setTransfer_status_id(transferStatusId);
+			transferProcess.setTransfer_type_id(transferTypeId);
 			authenticationService.newTransfer(currentUser.getToken(), transferProcess);
 			System.out.println(amount + " TE Bucks were sent to user " + toUserId);
 		} else {
@@ -212,7 +217,12 @@ public class App {
 			Integer toUserId = currentUser.getUser().getId();
 			int transferTypeId = 1;
 			int transferStatusId = 1;
-			Transfer transferProcess = new Transfer(transferTypeId, transferStatusId, amount, fromUserId, toUserId);
+			Transfer transferProcess = new Transfer();
+			transferProcess.setAccount_from(fromUserId);
+			transferProcess.setAccount_to(toUserId);
+			transferProcess.setAmount(amount);
+			transferProcess.setTransfer_status_id(transferStatusId);
+			transferProcess.setTransfer_type_id(transferTypeId);
 			authenticationService.newTransfer(currentUser.getToken(), transferProcess);
 			System.out.println(amount + " TE Bucks were requested from user " + fromUserId);
 		} else {

@@ -11,29 +11,29 @@ public class Transfer {
 	private int account_to;
 	private int account_from;
 
-	public Transfer(int transfer_type_id, Double amount, int account_to, int account_from) {
-		this.transfer_type_id = transfer_type_id;
-		this.transfer_status_id = transfer_status_id;
-		this.amount = amount;
-		this.account_to = account_to;
-		this.account_from = account_from;
-	}
-
-	public Transfer(int transfer_id, int transfer_type_id, Double amount, int account_to, int account_from) {
-		super();
-		this.transfer_id = transfer_id;
-		this.transfer_type_id = transfer_type_id;
-		this.transfer_status_id = transfer_status_id;
-		this.amount = amount;
-		this.account_to = account_to;
-		this.account_from = account_from;
-	}
-
-	public Transfer(int account_from, int account_to, Double amount) {
-		this.amount = amount;
-		this.account_to = account_to;
-		this.account_from = account_from;
-	}
+//	public Transfer(int transfer_type_id, Double amount, int account_to, int account_from) {
+//		this.transfer_type_id = transfer_type_id;
+//		this.transfer_status_id = transfer_status_id;
+//		this.amount = amount;
+//		this.account_to = account_to;
+//		this.account_from = account_from;
+//	}
+//
+//	public Transfer(int transfer_id, int transfer_type_id, Double amount, int account_to, int account_from) {
+//		super();
+//		this.transfer_id = transfer_id;
+//		this.transfer_type_id = transfer_type_id;
+//		this.transfer_status_id = transfer_status_id;
+//		this.amount = amount;
+//		this.account_to = account_to;
+//		this.account_from = account_from;
+//	}
+//
+//	public Transfer(int account_from, int account_to, Double amount) {
+//		this.amount = amount;
+//		this.account_to = account_to;
+//		this.account_from = account_from;
+//	}
 
 	public int getAccount_from() {
 		return account_from;

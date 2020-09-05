@@ -1,10 +1,6 @@
 package com.techelevator.tenmo.dao;
-
-import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.NoSuchElementException;
-import java.util.Scanner;
 
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.rowset.SqlRowSet;
@@ -38,6 +34,7 @@ public class TransferSqlDAO implements TransferDAO {
 				}
 				updateBalance(transfer);
 				updateBalance1(transfer);
+				updateBalance2(transfer);
 				System.out.println("The request has been approved.");
 			}
 			if (optionChoice == 2) {
@@ -162,10 +159,8 @@ public class TransferSqlDAO implements TransferDAO {
 	@Override
 	public boolean updateBalance1(Transfer transfer) {
 		boolean itWorked = true;
-		int transferId = transfer.getTransfer_id();
 		Double amount = transfer.getAmount();
 		int accountFrom = transfer.getAccount_from();
-		int accountTo = transfer.getAccount_to();
 
 		try {
 
@@ -180,7 +175,19 @@ public class TransferSqlDAO implements TransferDAO {
 
 			String sql3 = "UPDATE accounts SET balance = ? WHERE account_id = ?";
 			SqlRowSet row3 = jdbcTemplate.queryForRowSet(sql3, newAmt1, accountFrom);
+		} catch (Exception e) {
+			itWorked = false;
+		}
 
+		return itWorked;
+	}
+	
+	@Override
+	public boolean updateBalance2(Transfer transfer) {
+		boolean itWorked = true;
+		int transferId = transfer.getTransfer_id();
+
+		try {
 			// update transfer status
 			String sql4 = "UPDATE transfers SET transfer_status_id = 2 WHERE transfer_id = ?";
 			SqlRowSet row4 = jdbcTemplate.queryForRowSet(sql4, transferId);
@@ -197,7 +204,13 @@ public class TransferSqlDAO implements TransferDAO {
 		int accountFrom = (rs.getInt("account_from"));
 		int accountTo = (rs.getInt("account_to"));
 		Double amount = (rs.getDouble("amount"));
-		Transfer transfer = new Transfer(transferId, transferTypeId, transferStatusId, accountFrom, accountTo, amount);
+		Transfer transfer = new Transfer();
+		transfer.setAccount_from(accountFrom);
+		transfer.setAccount_to(accountTo);
+		transfer.setAmount(amount);
+		transfer.setTransfer_id(transferId);
+		transfer.setTransfer_status_id(transferStatusId);
+		transfer.setTransfer_type_id(transferTypeId);
 		return transfer;
 	}
 
