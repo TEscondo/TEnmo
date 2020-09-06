@@ -139,6 +139,8 @@ public class App {
 
 	private void viewPendingRequests() throws AuthenticationServiceException {
 		TransferBack[] pendingTransfers = null;
+		double balance = authenticationService.getBalance(currentUser.getToken());
+		double pendTransAmt = 0.0;
 		try {
 			pendingTransfers = authenticationService.viewPending(currentUser.getToken(), currentUser.getUser().getId());
 			System.out.println("-------------PENDING TRANSFERS-------------");
@@ -147,6 +149,7 @@ public class App {
 			for (TransferBack pendingTransfer : pendingTransfers) {
 				System.out.println(pendingTransfer.getTransferId() + "          " + pendingTransfer.getUsernameTo()
 						+ "                $" + pendingTransfer.getAmount());
+				pendTransAmt = pendingTransfer.getAmount();
 			}
 		} catch (NullPointerException e) {
 			System.out.println("You have no pending transfers.");
@@ -164,7 +167,7 @@ public class App {
 			System.out.println("0: Don't approve or reject");
 			System.out.println("---------");
 			choice = console.getUserInputInteger("Please choose an option");
-			if (choice == 1) {
+			if (choice == 1 && balance > pendTransAmt) {
 				try {
 					authenticationService.updatePendingApprove(currentUser.getToken(), currentUser.getUser().getId(),
 							transferId);
@@ -179,7 +182,11 @@ public class App {
 					System.out.println("Something went wrong");
 				}
 				System.out.println("Cancelling...");
-			} else if (choice == 0) {
+			} 
+			else if (choice == 1 && balance < pendTransAmt) {
+				System.out.println("Not enough funds...");
+			}
+			else if (choice == 0) {
 				;
 			}
 		}
