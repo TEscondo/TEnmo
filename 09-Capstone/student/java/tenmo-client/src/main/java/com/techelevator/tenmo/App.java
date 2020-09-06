@@ -161,6 +161,7 @@ public class App {
 		}
 		}catch (NullPointerException e) {
 			System.out.println("You have no pending transfers.");
+			System.exit(0);
 		}
 		System.out.println("---------");
 		if (pendingTransfers.length == 0) {
@@ -216,10 +217,10 @@ public class App {
 			System.out.println(amount + " TE Bucks were sent to user " + toUserId);
 		} 
 		else if (amount > balance) {
-			System.out.println("Insufficient funds...");
+			System.out.println("Insufficient funds.");
 		}
 		else {
-			System.out.println("Cancelling transfer...");
+			System.out.println("Cancelling transfer.");
 		}
 
 	}
@@ -238,7 +239,12 @@ public class App {
 			transferProcess.setAmount(amount);
 			transferProcess.setTransfer_status_id(transferStatusId);
 			transferProcess.setTransfer_type_id(transferTypeId);
+			try {
 			authenticationService.transferRequest(currentUser.getToken(), transferProcess);
+			}catch (NullPointerException e) {
+				System.out.println("Error occured. Please try again.");
+				System.exit(0);
+			}
 			System.out.println(amount + " TE Bucks were requested from user " + fromUserId);
 		} else {
 			System.out.println("Cancelling transfer...");
