@@ -1,13 +1,5 @@
 package com.techelevator.tenmo;
 
-import java.math.BigDecimal;
-import java.util.List;
-import java.util.Scanner;
-
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
-import org.springframework.web.client.RestClientResponseException;
 import org.springframework.web.client.RestTemplate;
 
 import com.techelevator.tenmo.models.AuthenticatedUser;
@@ -105,61 +97,58 @@ public class App {
 		} catch (NullPointerException e) {
 			System.out.println("No previous transfers to view.");
 		}
-			viewTransferDetails();
+		viewTransferDetails();
 
 	}
-		private void viewTransferDetails() throws AuthenticationServiceException {
-			TransferBack[] transfers = authenticationService.viewTransfers(currentUser.getToken(),
-					currentUser.getUser().getId());
-			Integer transferId = console.getUserInputInteger("Please enter transfer ID to view details (0 to cancel)");
-			for (int i = 0; i<transfers.length; i++) {
-				if (transferId != 0 && transferId == transfers[i].getTransferId()) {
-					String transferType = "";
-					String transferStatus = "";
-					if (transfers[i].getTransferTypeId() == 1) {
-						transferType = "Request";
-					}
-					else if (transfers[i].getTransferTypeId() == 2) {
-						transferType = "Send";
-					}
-					if (transfers[i].getTransferStatusId() == 1) {
-						transferStatus = "Pending";
-					}
-					else if (transfers[i].getTransferStatusId() == 2) {
-						transferStatus = "Approved";
-					}
-					else if (transfers[i].getTransferStatusId() == 3) {
-						transferStatus = "Rejected";
-					}
-					
-					System.out.println("-------------------------------------------");
-					System.out.println("Transfer Details");
-					System.out.println("-------------------------------------------");
-					System.out.println("Id: " + transferId);
-					System.out.println("From: " + transfers[i].getUsernameFrom());
-					System.out.println("To: " + transfers[i].getUsernameTo());
-					System.out.println("Type: " + transferType);
-					System.out.println("Status: " + transferStatus);
-					System.out.println("Amount: $" + transfers[i].getAmount());
-				
+
+	private void viewTransferDetails() throws AuthenticationServiceException {
+		TransferBack[] transfers = authenticationService.viewTransfers(currentUser.getToken(),
+				currentUser.getUser().getId());
+		Integer transferId = console.getUserInputInteger("Please enter transfer ID to view details (0 to cancel)");
+		for (int i = 0; i < transfers.length; i++) {
+			if (transferId != 0 && transferId == transfers[i].getTransferId()) {
+				String transferType = "";
+				String transferStatus = "";
+				if (transfers[i].getTransferTypeId() == 1) {
+					transferType = "Request";
+				} else if (transfers[i].getTransferTypeId() == 2) {
+					transferType = "Send";
+				}
+				if (transfers[i].getTransferStatusId() == 1) {
+					transferStatus = "Pending";
+				} else if (transfers[i].getTransferStatusId() == 2) {
+					transferStatus = "Approved";
+				} else if (transfers[i].getTransferStatusId() == 3) {
+					transferStatus = "Rejected";
+				}
+
+				System.out.println("-------------------------------------------");
+				System.out.println("Transfer Details");
+				System.out.println("-------------------------------------------");
+				System.out.println("Id: " + transferId);
+				System.out.println("From: " + transfers[i].getUsernameFrom());
+				System.out.println("To: " + transfers[i].getUsernameTo());
+				System.out.println("Type: " + transferType);
+				System.out.println("Status: " + transferStatus);
+				System.out.println("Amount: $" + transfers[i].getAmount());
+
 			}
-				
-			}
+
+		}
 	}
 
 	private void viewPendingRequests() throws AuthenticationServiceException {
 		TransferBack[] pendingTransfers = null;
 		try {
-		pendingTransfers = authenticationService.viewPending(currentUser.getToken(),
-				currentUser.getUser().getId());
-		System.out.println("-------------PENDING TRANSFERS-------------");
-		System.out.println("ID          To                     Amount");
-		System.out.println("-------------------------------------------");
-		for (TransferBack pendingTransfer : pendingTransfers) {
-			System.out.println(pendingTransfer.getTransferId() + "          " + pendingTransfer.getUsernameTo()
-					+ "                $" + pendingTransfer.getAmount());
-		}
-		}catch (NullPointerException e) {
+			pendingTransfers = authenticationService.viewPending(currentUser.getToken(), currentUser.getUser().getId());
+			System.out.println("-------------PENDING TRANSFERS-------------");
+			System.out.println("ID          To                     Amount");
+			System.out.println("-------------------------------------------");
+			for (TransferBack pendingTransfer : pendingTransfers) {
+				System.out.println(pendingTransfer.getTransferId() + "          " + pendingTransfer.getUsernameTo()
+						+ "                $" + pendingTransfer.getAmount());
+			}
+		} catch (NullPointerException e) {
 			System.out.println("You have no pending transfers.");
 		}
 		System.out.println("---------");
@@ -175,25 +164,24 @@ public class App {
 			System.out.println("0: Don't approve or reject");
 			System.out.println("---------");
 			choice = console.getUserInputInteger("Please choose an option");
-		if (choice == 1) {
-			try {
-				authenticationService.updatePendingApprove(currentUser.getToken(), currentUser.getUser().getId(),
-						transferId);
-			} catch (NullPointerException e) {
-				System.out.println("Something went wrong");
-			}
-			}
-		else if (choice ==2) {
+			if (choice == 1) {
 				try {
-					authenticationService.updatePendingReject(currentUser.getToken(), currentUser.getUser().getId(), transferId);
+					authenticationService.updatePendingApprove(currentUser.getToken(), currentUser.getUser().getId(),
+							transferId);
 				} catch (NullPointerException e) {
 					System.out.println("Something went wrong");
 				}
-			System.out.println("Cancelling...");
-		}
-		else if (choice == 0) {
-			;
-		}
+			} else if (choice == 2) {
+				try {
+					authenticationService.updatePendingReject(currentUser.getToken(), currentUser.getUser().getId(),
+							transferId);
+				} catch (NullPointerException e) {
+					System.out.println("Something went wrong");
+				}
+				System.out.println("Cancelling...");
+			} else if (choice == 0) {
+				;
+			}
 		}
 	}
 
@@ -214,11 +202,9 @@ public class App {
 			transferProcess.setTransfer_type_id(transferTypeId);
 			authenticationService.transferSend(currentUser.getToken(), transferProcess);
 			System.out.println(amount + " TE Bucks were sent to user " + toUserId);
-		} 
-		else if (amount > balance) {
+		} else if (amount > balance) {
 			System.out.println("Insufficient funds...");
-		}
-		else {
+		} else {
 			System.out.println("Cancelling transfer...");
 		}
 

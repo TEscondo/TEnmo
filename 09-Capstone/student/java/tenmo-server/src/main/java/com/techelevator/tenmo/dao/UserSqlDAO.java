@@ -1,6 +1,5 @@
 package com.techelevator.tenmo.dao;
 
-import java.math.BigDecimal;
 import java.security.Principal;
 import java.sql.PreparedStatement;
 import java.util.ArrayList;
@@ -20,7 +19,6 @@ public class UserSqlDAO implements UserDAO {
 
 	private static final double STARTING_BALANCE = 1000;
 	private JdbcTemplate jdbcTemplate;
-	private User user = new User();
 
 	public UserSqlDAO(JdbcTemplate jdbcTemplate) {
 		this.jdbcTemplate = jdbcTemplate;
@@ -104,6 +102,5 @@ public class UserSqlDAO implements UserDAO {
 		user.setAuthorities("ROLE_USER");
 		return user;
 	}
-
 
 }

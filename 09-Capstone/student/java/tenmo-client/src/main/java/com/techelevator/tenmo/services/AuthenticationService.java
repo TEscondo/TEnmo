@@ -163,7 +163,7 @@ public class AuthenticationService {
 		  return pending;
 	  }
 	  
-	  public void updatePendingApprove(String token, int userId, int transferId) throws AuthenticationServiceException {
+	public void updatePendingApprove(String token, int userId, int transferId) throws AuthenticationServiceException {
 		  AUTH_TOKEN = token;
 		  try {
 			  restTemplate.exchange(BASE_URL+"transfers/" + userId + "/pending/2/" + transferId, HttpMethod.PUT, makeAuthEntity(), Transfer.class).getBody();

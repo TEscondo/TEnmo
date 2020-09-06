@@ -1,4 +1,5 @@
 package com.techelevator.tenmo.dao;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -14,7 +15,6 @@ import com.techelevator.tenmo.model.User;
 public class TransferSqlDAO implements TransferDAO {
 
 	private JdbcTemplate jdbcTemplate;
-	private User user = new User();
 
 	public TransferSqlDAO(JdbcTemplate jdbcTemplate) {
 		this.jdbcTemplate = jdbcTemplate;
@@ -22,28 +22,28 @@ public class TransferSqlDAO implements TransferDAO {
 
 	@Override
 	public void updatePendingApprove(int transferId) {
-				String sql = "UPDATE transfers SET transfer_status_id = 2 WHERE transfer_id = ?";
-				jdbcTemplate.update(sql, transferId);
-				
-				String sql1 = "SELECT * FROM transfers WHERE transfer_id = ?";
-				SqlRowSet row1 = jdbcTemplate.queryForRowSet(sql1, transferId);
-				Transfer transfer = null;
-				while(row1.next()) {
-					transfer = mapRowToTransfer(row1);
-				}
-				updateBalance(transfer);
-				updateBalance1(transfer);
-				updateBalance2(transfer);
-				System.out.println("The request has been approved.");		
+		String sql = "UPDATE transfers SET transfer_status_id = 2 WHERE transfer_id = ?";
+		jdbcTemplate.update(sql, transferId);
+
+		String sql1 = "SELECT * FROM transfers WHERE transfer_id = ?";
+		SqlRowSet row1 = jdbcTemplate.queryForRowSet(sql1, transferId);
+		Transfer transfer = null;
+		while (row1.next()) {
+			transfer = mapRowToTransfer(row1);
+		}
+		updateBalance(transfer);
+		updateBalance1(transfer);
+		updateBalance2(transfer);
+		System.out.println("The request has been approved.");
 	}
-	
+
 	@Override
 	public void updatePendingReject(int transferId) {
-			String sql = "UPDATE transfers SET transfer_status_id = 3 WHERE transfer_id = ?";
-			jdbcTemplate.update(sql, transferId);
-			System.out.println("The request has been rejected.");
+		String sql = "UPDATE transfers SET transfer_status_id = 3 WHERE transfer_id = ?";
+		jdbcTemplate.update(sql, transferId);
+		System.out.println("The request has been rejected.");
 	}
-	
+
 	@Override
 	public Transfer viewTransferDetails(int transferId) {
 		Transfer transfer = null;
@@ -76,7 +76,6 @@ public class TransferSqlDAO implements TransferDAO {
 		String usernameFromUser = "";
 		int transferType = 0;
 		int transferStatus = 0;
-		
 
 		String sql = "SELECT * FROM transfers WHERE account_from = ? OR account_to = ?";
 		SqlRowSet row = jdbcTemplate.queryForRowSet(sql, id, id);
@@ -100,7 +99,8 @@ public class TransferSqlDAO implements TransferDAO {
 				usernameFromUser = rowset2.getString("username");
 			}
 
-			TransferBack transfer = new TransferBack(transferId, usernameToUser, usernameFromUser, amount, transferType, transferStatus);
+			TransferBack transfer = new TransferBack(transferId, usernameToUser, usernameFromUser, amount, transferType,
+					transferStatus);
 			transferList.add(transfer);
 		}
 
@@ -130,7 +130,7 @@ public class TransferSqlDAO implements TransferDAO {
 			return null;
 		}
 	}
-	
+
 	@Override
 	public Transfer transferRequest(Transfer transfer) {
 		Double transferAmount = transfer.getAmount();
@@ -199,7 +199,7 @@ public class TransferSqlDAO implements TransferDAO {
 
 		return itWorked;
 	}
-	
+
 	@Override
 	public boolean updateBalance2(Transfer transfer) {
 		boolean itWorked = true;
@@ -214,7 +214,7 @@ public class TransferSqlDAO implements TransferDAO {
 		}
 		return itWorked;
 	}
-	
+
 	@Override
 	public boolean updateBalance3(Transfer transfer) {
 		boolean itWorked = true;
@@ -229,7 +229,6 @@ public class TransferSqlDAO implements TransferDAO {
 		}
 		return itWorked;
 	}
-	
 
 	private Transfer mapRowToTransfer(SqlRowSet rs) {
 		int transferId = (rs.getInt("transfer_id"));
