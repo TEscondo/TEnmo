@@ -12,6 +12,7 @@ public class TenmoAppTests {
 
 	@BeforeClass
 	public static void setUpBeforeClass() throws Exception {
+		
 	}
 
 	@AfterClass

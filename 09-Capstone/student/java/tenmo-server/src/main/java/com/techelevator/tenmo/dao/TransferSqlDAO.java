@@ -257,8 +257,10 @@ public class TransferSqlDAO implements TransferDAO {
 		String usernameToUser = "";
 		String usernameFromUser = "";
 
-		String sql = "SELECT * FROM transfers WHERE (account_from = ? AND transfer_status_id = 1) OR (account_to = ? AND transfer_status_id = 1)";
-		SqlRowSet row = jdbcTemplate.queryForRowSet(sql, id, id);
+		String sql = "SELECT * FROM transfers WHERE account_from = ? AND transfer_status_id = 1";
+		// OR (account_to = ? AND transfer_status_id = 1)
+		//The SQL above allowed for users to approve requests made to other users - aka steal their hard earned TE bucks!
+		SqlRowSet row = jdbcTemplate.queryForRowSet(sql, id); 
 		while (row.next()) {
 			transferId = row.getInt("transfer_id");
 			amount = row.getDouble("amount");

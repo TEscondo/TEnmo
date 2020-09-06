@@ -186,11 +186,24 @@ public class App {
 	}
 
 	private void sendBucks() throws Exception {
-		showUsers();
+		
+		System.out.println("--------------------------");
+		System.out.println("Users");
+		System.out.println("ID     NAME");
+		System.out.println("--------------------------");
+		User[] users = authenticationService.getUsers(currentUser.getToken());
+		for (User u : users) {
+			System.out.println(u.getId() + "     " + u.getUsername());
+		}
+		System.out.println("--------------------------");
+		// Had to fully spell out the showUsers method here and in requestBucks to prevent the user
+		// from making transfers to invalid user IDs
+
+		
 		double balance = authenticationService.getBalance(currentUser.getToken());
 		Integer toUserId = console.getUserInputInteger("Enter ID of user you are sending to (0 to cancel)");
 		Double amount = console.getUserInputDouble("Enter amount");
-		if (toUserId != 0 && amount < balance && toUserId != currentUser.getUser().getId()) {
+		if (toUserId != 0 && amount < balance && toUserId != currentUser.getUser().getId() && toUserId <= users.length && toUserId > 0 && amount > 0) {
 			Integer fromUserId = currentUser.getUser().getId();
 			int transferTypeId = 2;
 			int transferStatusId = 2;
@@ -205,16 +218,26 @@ public class App {
 		} else if (amount > balance) {
 			System.out.println("Insufficient funds...");
 		} else {
-			System.out.println("Cancelling transfer...");
+			System.out.println("Invalid transfer...");
 		}
 
 	}
 
 	private void requestBucks() throws Exception {
-		showUsers();
+		
+		System.out.println("--------------------------");
+		System.out.println("Users");
+		System.out.println("ID     NAME");
+		System.out.println("--------------------------");
+		User[] users = authenticationService.getUsers(currentUser.getToken());
+		for (User u : users) {
+			System.out.println(u.getId() + "     " + u.getUsername());
+		}
+		System.out.println("--------------------------");
+		
 		int fromUserId = console.getUserInputInteger("Enter ID of user you are requesting from (0 to cancel)");
 		double amount = console.getUserInputDouble("Enter amount");
-		if (fromUserId != 0 && fromUserId != currentUser.getUser().getId()) {
+		if (fromUserId != 0 && fromUserId != currentUser.getUser().getId() && fromUserId <= users.length && fromUserId > 0 && amount > 0) {
 			Integer toUserId = currentUser.getUser().getId();
 			int transferTypeId = 1;
 			int transferStatusId = 1;
@@ -227,7 +250,7 @@ public class App {
 			authenticationService.transferRequest(currentUser.getToken(), transferProcess);
 			System.out.println(amount + " TE Bucks were requested from user " + fromUserId);
 		} else {
-			System.out.println("Cancelling transfer...");
+			System.out.println("Invalid transfer...");
 		}
 
 	}
