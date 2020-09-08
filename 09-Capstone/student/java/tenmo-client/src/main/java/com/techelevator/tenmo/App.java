@@ -82,7 +82,7 @@ public class App {
 	}
 
 	private void viewTransferHistory() throws AuthenticationServiceException {
-		TransferBack[] transfers = authenticationService.viewTransfers(currentUser.getToken(),
+		TransferBack[] transfers = authenticationService.viewTransfers(currentUser.getToken(), 
 				currentUser.getUser().getId());
 
 		System.out.println("-------------------------------------------");
