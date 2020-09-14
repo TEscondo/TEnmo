@@ -1,0 +1,28 @@
+Group 1 Feedback
+- There are some cleanup issues, i.e. unused variables.
+
+- On the TransferSqlDAO consider giving your methods more descriptive names. It's hard
+to tell what these are:
+public boolean updateBalance1(Transfer transfer)
+public boolean updateBalance2(Transfer transfer)
+
+- I'm unable to send exactly 1,000 TE Bucks:
+
+Please choose an option >>> 2
+
+--------------------------
+Users
+ID     NAME
+--------------------------
+1     user
+2     admin
+3     FlyingWombat
+--------------------------
+Enter ID of user you are sending to (0 to cancel): 1
+Enter amount: 1000
+Cancelling transfer.
+
+I believe on your TransferSqlDAO you can make an adjustment here:
+
+Double transferAmount = transfer.getAmount();
+if (transferAmount < balance) {
